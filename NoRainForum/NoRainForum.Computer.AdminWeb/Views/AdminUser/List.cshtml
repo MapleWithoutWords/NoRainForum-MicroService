@@ -1,0 +1,125 @@
+﻿
+@model ListModel<ListAdminUserDTO>
+
+<section class="layui-larry-box">
+    <div class="larry-personal">
+        <div class="layui-tab">
+            <blockquote class="layui-elem-quote adminUser_search">
+                <div class="layui-inline">
+                    <a class="layui-btn layui-btn-normal adminUserAdd_btn">添加管理员</a>
+                </div>
+                <div class="layui-inline">
+                    <a class="layui-btn layui-btn-danger batchDel">批量删除</a>
+                </div>
+                <div class="layui-inline">
+                    <div class="layui-form-mid layui-word-aux"></div>
+                </div>
+                <div class="layui-inline">
+                    <span class="layui-form-mid">共有<span style="font-weight: bold"> @Model.TotalCount </span>条数据</span>
+                </div>
+            </blockquote>
+
+            <!-- 操作日志 -->
+            <div class="layui-form adminUser_list">
+                <table class="layui-table">
+                    <colgroup>
+                        <col width="10%">
+                        <col>
+                        <col>
+                        <col>
+                        <col>
+                        <col>
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th>
+                                <input name="" lay-skin="primary" lay-filter="allChoose" id="allChoose" type="checkbox">
+                                <div class="layui-unselect layui-form-checkbox" lay-skin="primary">
+                                    <i class="layui-icon"></i>
+                                </div>
+                            </th>
+                            <th>管理员名称</th>
+                            <th>年龄</th>
+                            <th>手机号</th>
+                            <th>性别</th>
+                            <th>时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody class="adminUser_content">
+                        @foreach (var item in Model.Datas)
+                        {
+                            <tr>
+                                <td>
+                                    <input name="checked" lay-skin="primary" lay-filter="choose" type="checkbox">
+                                    <div class="layui-unselect layui-form-checkbox" lay-skin="primary">
+                                        <i class="layui-icon"></i>
+                                    </div>
+                                </td>
+                                <td>@item.Name</td>
+                                <td>@item.Age</td>
+                                <td>@item.PhoneNum</td>
+                                <td>
+                                    @if (@item.Gender)
+                                    {
+                                        @("男")
+                                    }
+                                    else
+                                    {
+                                        @("女")
+                                    }
+
+                                </td>
+                                <td>
+                                    @item.CreateTime
+                                </td>
+                                <td>
+                                    <a class="layui-btn layui-btn-mini adminUser_edit" data-id="@item.Id"><i class="iconfont icon-edit"></i> 编辑</a>
+                                    <a class="layui-btn layui-btn-danger layui-btn-mini adminUser_del" data-id="@item.Id">
+                                        <i class="layui-icon"></i> 删除
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+                <div class="larry-table-page clearfix">
+                    <div id="page" class="page">
+                        <div class="layui-box layui-laypage layui-laypage-default">
+                            @Html.Raw(ViewData["Page"])
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</section>
+@section scripts{
+    <script src="~/js/Ajax.js"></script>
+    <script>
+        var appConfig = {
+            name: "adminUser",    //需要和页面名称对应
+            title: "管理员",    //显示的名称
+            addUrl: "/AdminUser/Add",   //添加弹框的路径
+            editUrl: "/AdminUser/Edit",      //修改弹框的路径
+            delUrl:"/AdminUser/Delete",
+            //批量删除Ajax
+            batchDel: function (data) {     //Array data 得到的是 需要删除的id
+                console.log(data);
+                //data.each(function (index, value) {
+                //    console.log(value);
+
+                //});
+
+            },
+            del: function (data,$,layer) {
+
+                noRainAJAX($, layer, "/AdminUser/Delete", { "id": data })
+            }
+        };
+
+    </script>
+}
