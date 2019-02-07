@@ -1,0 +1,260 @@
+﻿@{
+    Layout = "~/Views/Shared/IndexLayout.cshtml";
+}
+<!--帖子内容-->
+<div class="fly-panel detail-box" id="detailBox">
+
+</div>
+
+<div class="fly-panel detail-box" id="flyReply">
+    <fieldset class="layui-elem-field layui-field-title" style="text-align: center;">
+        <legend>回帖</legend>
+    </fieldset>
+    <!--评论信息-->
+    <ul class="jieda" id="jieda"></ul>
+    <!--评论分页-->
+    <div id="demo1">
+        <div class="layui-box layui-laypage layui-laypage-default" id="layui-laypage-1">
+
+        </div>
+    </div>
+    <!--评论表单-->
+    <div class="layui-form layui-form-pane">
+        <input type="hidden" id="userId" value="" />
+        <form id="replyForm" method="post">
+            <input type="hidden" name="PostId" id="subPostId" value="" />
+            <input type="hidden" name="ReplyUserId" id="ReplyUserId" value="" />
+            <div class="layui-form-item layui-form-text">
+                <a name="comment"></a>
+                <div class="layui-input-block">
+                    <textarea id="L_content" name="content" required lay-verify="required" placeholder="请输入内容" class="layui-textarea fly-editor" style="height: 150px;"></textarea>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <input type="hidden" name="jid" value="123">
+                <button class="layui-btn" lay-filter="replybtn" lay-submit>提交回复</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<script id="loadPost" type="text/html">
+    <h1>{{ d.post.title }}</h1>
+    <div class="fly-detail-info">
+        <span class="layui-badge layui-bg-green fly-detail-column">{{ d.post.postTypeName }}</span>
+        {{#  if(d.post.isKnot){ }}
+        <span class="layui-badge" style="background-color: #5FB878;">已结</span>
+        {{#  }else{ }}
+        <span class="layui-badge" style="background-color: #999;">未结</span>
+        {{#  } }}
+        {{#  if(d.post.isEssence){ }}
+        <span class="layui-badge layui-bg-red">精帖</span>
+        {{#  } }}
+        <div class="fly-admin-box" " data-id="123">
+            <span class="layui-btn layui-btn-xs jie-admin" data-postId="{{d.post.id}}" id="collection">收藏</span>
+        </div>
+        <span class="fly-list-nums">
+            <a href="#comment"><i class="iconfont" title="回答">&#xe60c;</i> {{d.post.commentCount}}</a>
+            <i class="iconfont" title="人气">&#xe60b;</i>{{d.lookCount}}
+        </span>
+    </div>
+    <div class="detail-about">
+        <a class="fly-avatar" href="../user/home.html">
+            <img src="{{d.user.headImgSrc}}" alt="{{d.user.nickName}}">
+        </a>
+        <div class="fly-detail-user">
+            <a href="../user/home.html" class="fly-link">
+                <cite>{{d.user.nickName}}</cite>
+            </a>
+            <span>{{d.post.createTime}}</span>
+        </div>
+    </div>
+    <div class="detail-body photos" id="postDetail">
+        {{d.post.content}}
+    </div>
+</script>
+<script id="loadPostComment" type="text/html">
+
+    {{#  layui.each(d.comments, function(index, item){ }}
+    <li data-id="{{item.id}}" class="jieda-daan">
+        <a name="item-{{item.id}}"></a>
+        <div class="detail-about detail-about-reply">
+            <a class="fly-avatar" href="">
+                <img src="{{d.users[index].headImgSrc}}" alt="{{d.users[index].nickName}}">
+            </a>
+            <div class="fly-detail-user">
+                <a href="" class="fly-link">
+                    <cite>{{d.users[index].nickName}}</cite>
+                    <i class="iconfont icon-renzheng" title="认证信息：XXX"></i>
+                </a>
+                {{#  if(item.commentUserId==item.postUserId){ }}
+                <span>(楼主)</span>
+                {{# } }}
+                <!--
+                <span style="color:#5FB878">(管理员)</span>
+                <span style="color:#FF9E3F">（社区之光）</span>
+                <span style="color:#999">（该号已被封）</span>
+                -->
+            </div>
+
+            <div class="detail-hits">
+                <span>{{item.createTime}}</span>
+            </div>
+
+            {{#  if(item.isUse){ }}
+            <i class="iconfont icon-caina" title="最佳答案"></i>
+            {{# } }}
+        </div>
+        <div class="detail-body jieda-body photos">
+            <p class="commentContent">{{item.content}}</p>
+        </div>
+        <div class="jieda-reply">
+            <span class="jieda-zan zanok" type="zan">
+                <i class="iconfont icon-zan"></i>
+                <em>66</em>
+            </span>
+            <span type="reply" onclick="reply(this)" replyUserId="{{item.commentUserId}}">
+                <i class="iconfont icon-svgmoban53"></i>
+                回复
+            </span>
+            <div class="jieda-admin">
+                {{#  if(!item.isKnot){ }}
+                <span class="jieda-accept" onclick="adopt(this,{{item.id}})" data-commentId="{{item.id}}" type="accept">采纳</span>
+                {{#  } }}
+            </div>
+        </div>
+    </li>
+    {{#  }); }}
+    {{#  if(d.comments.length === 0){ }}
+    <div class="fly-none">没有相关数据</div>
+    {{#  } }}
+</script>
+@section scripts{
+    <script src="~/js/Ajax.js"></script>
+    <script>
+        layui.use(['jquery', 'laytpl', 'layer', 'fly', 'form'], function () {
+            let $ = layui.jquery,
+                laytpl = layui.laytpl,
+                layer = layui.layer,
+                fly = layui.fly,
+                form = layui.form;
+            //获取帖子Id
+            let arrs = location.search.substring(1).split("=");
+            if (arrs[0] != "postId") {
+                location.href = "/error/Error404";
+            }
+            let postId = arrs[1];
+            //加载帖子内容
+            FrontLoadAjax($, layer, "/Post/Detail", { "postId": postId }, function (data) {
+                data.post.content = fly.content(data.post.content);
+                let getTpl = loadPost.innerHTML
+                    , view = document.getElementById('detailBox');
+                laytpl(getTpl).render(data, function (html) {
+                    view.innerHTML = html;
+                });
+                $('#subPostId').val(data.post.id);
+                $('#ReplyUserId').val(data.post.userId);
+                $('#userId').val(data.post.userId);
+
+                $('#collection').click(function () {
+                    console.log(1111);
+                    let postId = $(this).attr('data-postId');
+                    let that = $(this);
+                    FrontLoadAjax($, layer, "/post/collection", { "postId": postId }, function () {
+                        layer.msg("收藏成功", { icon: 1, time: 1000 });
+                        that.text("已收藏").css("background-color", "#999");
+                    });
+
+                });
+            });
+            //加载评论
+            LoadComment(1, 5);
+            function LoadComment(pageIndex, pageDataCount) {
+                let arrs = location.search.substring(1).split("=");
+                if (arrs[0] != "postId") {
+                    location.href = "/error/Error404";
+                }
+                let postId = arrs[1];
+                FrontLoadAjax($, layer, "/Post/GetCommentByPostId", { "postId": postId, "pageIndex": pageIndex, "pageDataCount": pageDataCount }, function (data) {
+                    let getTpl = loadPostComment.innerHTML
+                        , view = document.getElementById('jieda');
+                    laytpl(getTpl).render(data, function (html) {
+                        view.innerHTML = html;
+                        $('.commentContent').each(function () {
+                            var othis = $(this), html = othis.html();
+                            othis.html(fly.content(html));
+                        });
+                    });
+                    let html = AjaxPage(data.totalCount, pageIndex, pageDataCount, 5);
+                    $('#layui-laypage-1').html(html);
+                    $('.commentPage').click(function () {
+                        let index = $(this).attr('data-page');
+                        console.log(index);
+                        LoadComment(index, 5);
+                    });
+                });
+                return false;
+            };
+            //ajax分页
+            function AjaxPage(dataCount, pageIndex, pageDataCount, showPageCount) {
+                if (dataCount < pageDataCount) {
+                    return "";
+                }
+                let pageCount = Math.ceil(dataCount / pageDataCount);
+                if (pageIndex < 1 || pageIndex > pageCount) {
+                    throw new Error("pageIndex不能小于1，且不能大于总数量")
+                }
+                let startPage = Math.max(1, (pageIndex - Math.floor(showPageCount / 2)));
+                let endPage = Math.min(pageCount, (pageIndex + Math.floor(showPageCount / 2)));
+                let html = "";
+                if (pageIndex > showPageCount) {
+                    html += '< a href = "javascript:;" class="layui-laypage-prev" class="commentPage" data-page="1">首页</a >< a href = "javascript:;" class="layui-laypage-prev" class="commentPage" data-page="' + (pageIndex - 1) + '">上一页</a >';
+                }
+                for (var i = startPage; i <= endPage; i++) {
+                    if (i == pageIndex) {
+                        html += '<span class="layui-laypage-curr"><em class="layui-laypage-em"></em><em>' + i + '</em></span>';
+                    } else {
+                        html += "<a href='javascript:;' class='commentPage' data-page='" + i + "'>" + i + "</a>";
+                    }
+                }
+                if (pageIndex < pageCount - Math.floor(showPageCount / 2)) {
+                    html += '<a href = "javascript:;" class="layui-laypage-next"  class="commentPage" data-page="' + (pageIndex + 1) + '">下一页</a ><a href = "javascript:;" class="layui-laypage-prev" class="commentPage" data-page="' + pageCount + '">尾页</a >';
+                }
+                return html;
+            };
+            //回复
+            window.reply = function reply(that) {
+                let content = $('#L_content');
+                let id = $(that).attr("replyUserId");
+                $('#ReplyUserId').val(id);
+                var val = content.val();
+                var aite = '@@' + $(that).parent().parent().find('.fly-detail-user cite').text().replace(/\s/g, '');
+                content.focus()
+                if (val.indexOf(aite) !== -1) return;
+                content.val(aite + ' ' + val);
+            }
+            //回复内容为空时，默认回复给帖子主人
+            $('#L_content').change(function () {
+                if ($(this).val() == '') {
+                    console.log(111);
+                    $('#ReplyUserId').val($('#userId').val());
+                }
+            })
+            $('#subPostId').val(postId);
+            window.adopt = function adopt(that, commentId) {
+                noRainAJAX($, layer, "/post/Adopt", { "commentId": commentId, "postId": $('#subPostId').val() });
+            }
+            form.on('submit(replybtn)', function () {
+                let json = $('#replyForm').serialize();
+                $('#L_content').val("");
+                FrontLoadAjax($, layer, '/post/comment', json, function (data) {
+                    layer.msg("评论成功", { icon: 1, time: 1000 });
+                    LoadComment(1, 5);
+                });
+                return false;
+            });
+        });
+
+    </script>
+}

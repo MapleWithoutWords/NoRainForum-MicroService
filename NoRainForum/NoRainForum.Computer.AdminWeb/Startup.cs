@@ -10,6 +10,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Redis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using NoRainForum.Computer.AdminWeb.filters;
 using NoRainForum.Computer.AdminWeb.Models;
 using NoRainForumCommon;
@@ -35,12 +36,17 @@ namespace NoRainForum.Computer.AdminWeb
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
+            services.Configure<IISOptions>(options =>
+            {
+                options.ForwardClientCertificate = false;
+            });
+
             services.AddSingleton<IDistributedCache>(
              serviceProvider =>
                  new RedisCache(new RedisCacheOptions
                  {
                      Configuration = "127.0.0.1:6379",
-                     InstanceName = "Sample:"
+                     InstanceName = "AdminSample:"
                  }));
             //注册服务
             RegisterService(services);
@@ -48,11 +54,20 @@ namespace NoRainForum.Computer.AdminWeb
             services.AddSession();
             //添加权限验证
             services.AddSingleton(typeof(NoRainAuthorizationFilter));
+            services.AddSingleton(typeof(NoRainExceptionFilter));
             services.AddMvc(options =>
             {
                 var serviceProvider = services.BuildServiceProvider();
                 var obj = serviceProvider.GetService<NoRainAuthorizationFilter>();
+                var exceptionFilter = serviceProvider.GetService<NoRainExceptionFilter>();
                 options.Filters.Add(obj);
+                options.Filters.Add(exceptionFilter);
+                services.AddSingleton(new NoRainActionFilter());
+            })
+            .AddJsonOptions(options =>
+            {
+                //设置时间格式
+                options.SerializerSettings.DateFormatString = "yyyy-MM-dd";
             }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
@@ -66,10 +81,11 @@ namespace NoRainForum.Computer.AdminWeb
             services.AddSingleton(new PostTypeService(SettingModel.AppKey, SettingModel.AppSecret));
             services.AddSingleton(new SettingService(SettingModel.AppKey, SettingModel.AppSecret));
             services.AddSingleton(new UserService(SettingModel.AppKey, SettingModel.AppSecret));
+            services.AddSingleton(new PostCommentService(SettingModel.AppKey, SettingModel.AppSecret));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             if (env.IsDevelopment())
             {
@@ -89,6 +105,8 @@ namespace NoRainForum.Computer.AdminWeb
             });
             app.UseStaticFiles();
             app.UseCookiePolicy();
+            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+            loggerFactory.AddDebug();
         }
     }
 }

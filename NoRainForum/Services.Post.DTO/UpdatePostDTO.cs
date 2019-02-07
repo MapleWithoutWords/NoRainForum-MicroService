@@ -8,5 +8,6 @@ namespace Services.Post.DTO
     {
         public long Id { get; set; }
         public long PostStatusId { get; set; }
+        public bool IsEssence { get; set; } = false;
     }
 }

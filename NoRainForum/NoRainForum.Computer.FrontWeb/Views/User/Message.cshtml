@@ -1,0 +1,60 @@
+﻿@model ListUserDTO
+@{
+    ViewData["Title"] = "Message";
+    Layout = "~/Views/Shared/UserLayout.cshtml";
+}
+@section LoginUser{
+
+    <a class="fly-nav-avatar" href="javascript:;">
+        <cite class="layui-hide-xs">@Model.NickName</cite>
+        <img src="@Model.HeadImgSrc">
+    </a>
+}
+<div class="fly-panel fly-panel-user" pad20>
+    <div class="layui-tab layui-tab-brief" lay-filter="user" id="LAY_msg" style="margin-top: 15px;">
+        <button class="layui-btn layui-btn-danger" id="LAY_delallmsg">清空全部消息</button>
+        <div id="LAY_minemsg" style="margin-top: 10px;">
+            <ul class="mine-msg" id="msg">
+               
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script id="loadMessage" type="text/html">
+    {{#  layui.each(d.messages, function(index, item){ }}
+    <li data-id="123">
+        <blockquote class="layui-elem-quote">
+            <a href="/user/home?name={{item.commentUserName}}" target="_blank"><cite>{{item.commentUserName}}</cite></a>回答了您的求解<a target="_blank" href="/post/detail?postId={{item.postId}}"><cite>{{item.postTitle}}</cite></a>
+        </blockquote>
+        <p><span>{{item.createTime}}</span></p>
+    </li>
+    {{#  }); }}
+    {{#  if(d.messages.length === 0){ }}
+    <div class="fly-none">没有消息</div>
+    {{#  } }}
+</script>
+
+@section scripts{
+    <script src="~/js/FrontAjax.js"></script>
+    <script>
+        layui.use(['jquery', 'laytpl', 'layer'], function () {
+            let $ = layui.jquery,
+                laytpl = layui.laytpl,
+                layer = layui.layer;
+
+            $('#userMsg').addClass('layui-this');
+            FrontLoadAjax($, layer, "/user/getmsg", {}, function (data) {
+                let getTpl = loadMessage.innerHTML
+                    , view = document.getElementById('msg');
+                laytpl(getTpl).render({ "messages": data }, function (html) {
+                    view.innerHTML = html;
+                });
+            });
+            $('#LAY_delallmsg').click(function () {
+                $('#msg').html('');
+            });
+        });
+
+    </script>
+}

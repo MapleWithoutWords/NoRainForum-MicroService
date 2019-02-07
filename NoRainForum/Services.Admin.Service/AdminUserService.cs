@@ -26,6 +26,12 @@ namespace Services.Admin.Service
             entity.PasswordHash = MD5Helper.CalcMD5(dto.Password + entity.Salt);
             using (AdminUserContext ctx = new AdminUserContext())
             {
+                BaseService<AdminUserEntity> bs = new BaseService<AdminUserEntity>(ctx);
+                var phoneAdminUser = await bs.GetAll().SingleOrDefaultAsync(e=>e.PhoneNum==dto.PhoneNum);
+                if (phoneAdminUser!=null)
+                {
+                    throw new Exception("电弧号码已存在");
+                }
                 await ctx.AdminUsers.AddAsync(entity);
                 await ctx.SaveChangesAsync();
                 return entity.Id;
@@ -175,6 +181,15 @@ namespace Services.Admin.Service
             using (AdminUserContext ctx = new AdminUserContext())
             {
                 BaseService<AdminUserEntity> bs = new BaseService<AdminUserEntity>(ctx);
+                var phoneAdminUser = await bs.GetAll().SingleOrDefaultAsync(e => e.PhoneNum == dto.PhoneNum);
+                if (phoneAdminUser!=null)
+                {
+                    if (phoneAdminUser.Id!=dto.Id)
+                    {
+                        throw new Exception("电话号码已存在");
+                    }
+                }
+
                 AdminUserEntity entity = await bs.GetAll().SingleOrDefaultAsync(e => e.Id == dto.Id);
                 if (entity == null)
                 {

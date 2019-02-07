@@ -48,6 +48,9 @@ namespace Services.Other.API
                 case SendType.FoundPassword:
                     message.Body = $"找回密码，你的验证码是{Code},20分钟内有效，请尽快填写。";
                     break;
+                case SendType.ActiveEmail:
+                    message.Body = $"激活邮箱，你的验证码是{Code},20分钟内有效，请尽快填写。";
+                    break;
                 default:
                     message.Body = $"欢迎您注册NoRain论坛，你的验证码是{Code},20分钟内有效，请尽快填写。";
                     break;
@@ -94,6 +97,9 @@ namespace Services.Other.API
                 case SendType.FoundPassword:
                     message.Body = $"找回密码，你的验证码是{Code},20分钟内有效，请尽快填写。";
                     break;
+                case SendType.ActiveEmail:
+                    message.Body = $"激活邮箱，你的验证码是{Code},20分钟内有效，请尽快填写。";
+                    break;
                 default:
                     message.Body = $"欢迎您注册NoRain论坛，你的验证码是{Code},20分钟内有效，请尽快填写。";
                     break;
@@ -110,7 +116,7 @@ namespace Services.Other.API
                 client.Send(message);
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
@@ -124,5 +130,6 @@ namespace Services.Other.API
     {
         Register=2,
         FoundPassword=4,
+        ActiveEmail = 8,
     }
 }

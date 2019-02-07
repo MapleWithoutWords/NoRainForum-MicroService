@@ -92,9 +92,9 @@ layui.define(['laypage', 'fly'], function(exports){
 
             fly.json('/case/push/', data.field, function(res){
               layer.close(index);
-                layer.alert(res.msg, {
-                    icon: 1
-                });
+              layer.alert(res.msg, {
+                icon: 1
+              })
             });
           });
         }

@@ -14,6 +14,10 @@ namespace Services.Post.DTO
         /// </summary>
         public long PostId { get; set; }
         /// <summary>
+        /// 帖子所属用户的ID
+        /// </summary>
+        public long PostUserId { get; set; }
+        /// <summary>
         /// 所属帖子标题
         /// </summary>
         public string PostTitle { get; set; }
@@ -29,5 +33,9 @@ namespace Services.Post.DTO
         /// 是否被采用
         /// </summary>
         public bool IsUse { get; set; }
+        /// <summary>
+        /// 是否结贴
+        /// </summary>
+        public bool IsKnot { get; set; }
     }
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
 using Microsoft.AspNetCore.Mvc;
+using NoRainForum.Computer.AdminWeb.filters;
 using NoRainForum.Computer.AdminWeb.Models;
 using NoRainForumCommon;
 using NoRainSDK.Models;
@@ -21,6 +22,7 @@ namespace NoRainForum.Computer.AdminWeb.Controllers
             this.AdminUserSvc = AdminUserSvc;
             this.RoleSvc = RoleSvc;
         }
+        [CheckPermission("AdminUser.List")]
         public async Task<IActionResult> List(int pageIndex = 1, int pageDataCount = 10)
         {
             ListModel<ListAdminUserDTO> model = await AdminUserSvc.GetPageDataAsync(pageIndex, pageDataCount);
@@ -36,6 +38,7 @@ namespace NoRainForum.Computer.AdminWeb.Controllers
             return View(model);
         }
         [HttpGet]
+        [CheckPermission("AdminUser.Add")]
         public async Task<IActionResult> Add()
         {
             var roles = await RoleSvc.GetAllAsync();
@@ -46,6 +49,7 @@ namespace NoRainForum.Computer.AdminWeb.Controllers
             return View(roles);
         }
         [HttpPost]
+        [CheckPermission("AdminUser.Add")]
         public async Task<IActionResult> Add(AddAdminUserAndRoleModel model)
         {
             using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
@@ -73,6 +77,7 @@ namespace NoRainForum.Computer.AdminWeb.Controllers
             }
         }
         [HttpGet]
+        [CheckPermission("AdminUser.Edit")]
         public async Task<IActionResult> Edit(long id)
         {
             ListAdminUserDTO adminUser = await AdminUserSvc.GetByIdAsync(id);
@@ -103,6 +108,7 @@ namespace NoRainForum.Computer.AdminWeb.Controllers
             return View(model);
         }
         [HttpPost]
+        [CheckPermission("AdminUser.Edit")]
         public async Task<IActionResult> Edit(UpdateAdminUserEditModel model)
         {
             using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
@@ -131,6 +137,7 @@ namespace NoRainForum.Computer.AdminWeb.Controllers
             }
         }
         [HttpPost]
+        [CheckPermission("AdminUser.Delete")]
         public async Task<IActionResult> Delete(long id)
         {
             if (await AdminUserSvc.DeleteAsync(id))

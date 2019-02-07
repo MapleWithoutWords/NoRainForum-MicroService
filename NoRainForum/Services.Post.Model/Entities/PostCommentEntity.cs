@@ -21,6 +21,6 @@ namespace Services.Post.Model.Entities
         /// <summary>
         /// 是否被采用
         /// </summary>
-        public bool IsUse { get; set; }
+        public bool IsUse { get; set; } = false;
     }
 }

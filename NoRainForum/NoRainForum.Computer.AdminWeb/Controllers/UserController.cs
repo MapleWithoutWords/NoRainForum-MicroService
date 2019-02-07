@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using NoRainForum.Computer.AdminWeb.filters;
 using NoRainForumCommon;
 using NoRainSDK.Models;
 using NoRainSDK.src;
@@ -16,6 +17,7 @@ namespace NoRainForum.Computer.AdminWeb.Controllers
         {
             this.UserSvc = UserSvc;
         }
+        [CheckPermission("User.List")]
         public async Task<IActionResult> List(int pageIndex = 1, int pageDataCount = 10)
         {
             var model = await UserSvc.GetPageDataAsync(pageIndex, pageDataCount);
@@ -32,11 +34,13 @@ namespace NoRainForum.Computer.AdminWeb.Controllers
 
         }
         [HttpGet]
+        [CheckPermission("User.Add")]
         public  IActionResult Add()
         {
             return View();
         }
         [HttpPost]
+        [CheckPermission("User.Add")]
         public async Task<IActionResult> Add(AddUserModel model)
         {
             if (await UserSvc.AddNewAsync(model)<1)
@@ -46,6 +50,7 @@ namespace NoRainForum.Computer.AdminWeb.Controllers
             return Json(new AjaxResult { Status = "ok"});
         }
         [HttpGet]
+        [CheckPermission("User.Edit")]
         public async Task<IActionResult> Edit(long id)
         {
             var user = await UserSvc.GetByIdAsync(id);
@@ -57,6 +62,7 @@ namespace NoRainForum.Computer.AdminWeb.Controllers
             return View(user);
         }
         [HttpPost]
+        [CheckPermission("User.Edit")]
         public async Task<IActionResult> Edit(UpdateUserModel model)
         {
             if (!await UserSvc.UpdateAsync(model))
@@ -67,6 +73,7 @@ namespace NoRainForum.Computer.AdminWeb.Controllers
         }
 
         [HttpPost]
+        [CheckPermission("User.Delete")]
         public async Task<IActionResult> Delete(long id)
         {
             if (!await UserSvc.DeleteAsync(id))

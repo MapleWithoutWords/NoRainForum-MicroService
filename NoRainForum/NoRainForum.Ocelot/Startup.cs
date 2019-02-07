@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 using Ocelot.Provider.Consul;
+using Ocelot.Provider.Polly;
 
 namespace NoRainForum.Ocelot
 {
@@ -24,7 +25,11 @@ namespace NoRainForum.Ocelot
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddOcelot(Configuration).AddConsul();
+            services.Configure<IISOptions>(options =>
+            {
+                options.ForwardClientCertificate = false;
+            });
+            services.AddOcelot(Configuration).AddPolly().AddConsul();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

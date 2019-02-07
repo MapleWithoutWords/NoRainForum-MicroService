@@ -18,5 +18,7 @@ namespace Services.User.IService
         Task UnLockUserAsync(long id);
         Task<bool> LoginAsync(string email, string password);
         Task EditorPasswordAsync(long id, string newPassword);
+        Task<List<ListUserDTO>> GetByIdsAsync(List<long> ids);
+        Task ActiveEmailAsync(long id);
     }
 }

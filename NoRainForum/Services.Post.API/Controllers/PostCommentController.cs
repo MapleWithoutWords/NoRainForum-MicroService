@@ -65,11 +65,11 @@ namespace Services.Post.API.Controllers
             {
                 return new JsonResult(new APIResult<long> { ErrorMsg = "帖子不存在" }) { StatusCode = 400 };
             }
-            return new JsonResult(new APIResult<ListCommentModel>
+            return new JsonResult(new APIResult<ListModel<ListPostCommentDTO>>
             {
-                Data = new ListCommentModel
+                Data = new ListModel<ListPostCommentDTO>
                 {
-                    Comments = await CommentSvc.GetPageByPostIdAsync(postId, pageIndex=1, pageDataCount=10),
+                     Datas = await CommentSvc.GetPageByPostIdAsync(postId, pageIndex, pageDataCount),
                     TotalCount = await CommentSvc.GetTotalCountByPostIdAsync(postId)
                 }
             });

@@ -5,9 +5,9 @@
         <div class="larry-personal-body clearfix">
             <form class="layui-form col-lg-5" id="addForm">
                 <div class="layui-form-item">
-                    <label class="layui-form-label">角色名</label>
+                    <label class="layui-form-label">帖子类型名</label>
                     <div class="layui-input-block">
-                        <input type="text" name="Name" autocomplete="off" class="layui-input" placeholder="请输入角色名">
+                        <input type="text" name="Name" autocomplete="off" class="layui-input" placeholder="请输入帖子类型名">
                     </div>
                 </div>
                 <div class="layui-form-item">
@@ -39,6 +39,7 @@
                 console.log(data.field)
                 var json = $("#addForm").serialize();
                 noRainAJAX($, layer, "/postType/Add", json, "添加成功");
+                
                 return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
             });
         });

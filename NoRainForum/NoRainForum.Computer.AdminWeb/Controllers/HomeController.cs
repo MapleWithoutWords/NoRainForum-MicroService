@@ -7,6 +7,7 @@ using CaptchaGen.NetCore;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NoRainForum.Computer.AdminWeb.common;
+using NoRainForum.Computer.AdminWeb.filters;
 using NoRainForum.Computer.AdminWeb.Models;
 using NoRainForumCommon;
 using NoRainSDK.Models;
@@ -21,14 +22,31 @@ namespace NoRainForum.Computer.AdminWeb.Controllers
         {
             this.AdminSvc = AdminSvc;
         }
-        [HttpGet]
-        public IActionResult Index()
+        [CheckPermission("Home.Index")]
+        public IActionResult Main()
         {
             return View();
         }
         [HttpGet]
+        [CheckPermission("Home.Index")]
+        public async Task<IActionResult> Index()
+        {
+            string admin = HttpContext.Session.GetString(ConstList.ADMINUSERID);
+            long id = Convert.ToInt64(admin);
+            var adminUser = await AdminSvc.GetByIdAsync(id);
+            if (adminUser == null)
+            {
+                return NotFound();
+            }
+            return View(adminUser);
+        }
+        [HttpGet]
         public IActionResult Login()
         {
+            if (!string.IsNullOrEmpty(HttpContext.Session.GetString(ConstList.ADMINUSERID)))
+            {
+                return Redirect(" /home/index");
+            }
             return View();
         }
         [HttpPost]
@@ -42,6 +60,7 @@ namespace NoRainForum.Computer.AdminWeb.Controllers
                 return Json(new AjaxResult { Status = "error", ErrorMsg = "验证码过期" });
             }
             string code = (string)TempData[ConstList.LOGINSESSION];
+            TempData[ConstList.LOGINSESSION] = null;
             if (!code.Equals(model.ValidCode, StringComparison.InvariantCultureIgnoreCase))
             {
                 return Json(new AjaxResult { Status = "error", ErrorMsg = "验证码错误" });
@@ -54,6 +73,7 @@ namespace NoRainForum.Computer.AdminWeb.Controllers
             HttpContext.Session.SetString(ConstList.ADMINUSERID, adminUser.Id.ToString());
             return Json(new AjaxResult { Status = "redirect", Data = "/Home/Index" });
         }
+        [HttpGet]
         public IActionResult GetValidCode()
         {
             string res = "";
@@ -63,29 +83,27 @@ namespace NoRainForum.Computer.AdminWeb.Controllers
             return File(stream, "image/jpeg");
         }
         [HttpGet]
+        [CheckPermission("Home.Index")]
         public async Task<IActionResult> PersonalInfo()
         {
             string admin = HttpContext.Session.GetString(ConstList.ADMINUSERID);
-            if (string.IsNullOrEmpty(admin))
-            {
-                return Redirect("/Home/Login");
-            }
             long id = Convert.ToInt64(admin);
-            var model =await AdminSvc.GetByIdAsync(id);
-            if (model==null)
+            var model = await AdminSvc.GetByIdAsync(id);
+            if (model == null)
             {
                 return Content(AdminSvc.ErrorMsg);
             }
             return View(model);
         }
         [HttpPost]
+        [CheckPermission("Home.Index")]
         public async Task<IActionResult> PersonalInfo(UpdateAdminUserModel model)
         {
             if (!await AdminSvc.UpdateAsync(model))
             {
-                return Json(new AjaxResult { Status="error", ErrorMsg=AdminSvc.ErrorMsg });
+                return Json(new AjaxResult { Status = "error", ErrorMsg = AdminSvc.ErrorMsg });
             }
-            return Json(new AjaxResult { Status = "ok"});
+            return Json(new AjaxResult { Status = "ok" });
         }
     }
 }

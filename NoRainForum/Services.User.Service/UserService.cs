@@ -25,6 +25,12 @@ namespace Services.User.Service
             en.PasswordHash = MD5Helper.CalcMD5(dto.Password + en.Salt);
             using (UserContext ctx = new UserContext())
             {
+                BaseService<UserEntity> bs = new BaseService<UserEntity>(ctx);
+                var emailEntity = await bs.GetAll().SingleOrDefaultAsync(e=>e.Email==dto.Email||e.NickName==dto.NickName);
+                if (emailEntity!=null)
+                {
+                    throw new Exception("用户邮箱或者昵称已存在");
+                }
                 await ctx.Users.AddAsync(en);
                 await ctx.SaveChangesAsync();
                 return en.Id;
@@ -46,19 +52,17 @@ namespace Services.User.Service
             dto.LoginErrorCount = en.LoginErrorCount;
             return dto;
         }
-
         public async Task EditorPasswordAsync(long id, string newPassword)
         {
             using (UserContext ctx = new UserContext())
             {
                 BaseService<UserEntity> userBs = new BaseService<UserEntity>(ctx);
-                var user = await userBs.GetAll().SingleAsync(e=>e.Id==id);
+                var user = await userBs.GetAll().SingleAsync(e => e.Id == id);
 
-                user.PasswordHash =  MD5Helper.CalcMD5(newPassword + user.Salt);
+                user.PasswordHash = MD5Helper.CalcMD5(newPassword + user.Salt);
                 await ctx.SaveChangesAsync();
             }
         }
-
         public async Task<ListUserDTO> GetByEmailAsync(string email)
         {
             using (UserContext ctx = new UserContext())
@@ -68,7 +72,6 @@ namespace Services.User.Service
                 return user == null ? null : TODTO(user);
             }
         }
-
         public async Task<ListUserDTO> GetByIdAsync(long id)
         {
             using (UserContext ctx = new UserContext())
@@ -78,7 +81,6 @@ namespace Services.User.Service
                 return user == null ? null : TODTO(user);
             }
         }
-
         public async Task<ListUserDTO> GetByNickNameAsync(string nickName)
         {
             using (UserContext ctx = new UserContext())
@@ -88,7 +90,6 @@ namespace Services.User.Service
                 return user == null ? null : TODTO(user);
             }
         }
-
         public async Task<List<ListUserDTO>> GetPageDataAsync(int pageIndex = 1, int pageDataCount = 10)
         {
             using (UserContext ctx = new UserContext())
@@ -104,8 +105,6 @@ namespace Services.User.Service
                 return list;
             }
         }
-
-
         public async Task<bool> IsLockAsync(long id)
         {
             using (UserContext ctx = new UserContext())
@@ -126,7 +125,6 @@ namespace Services.User.Service
                 return true;
             }
         }
-
         public async Task LockUserAsync(long id)
         {
             using (UserContext ctx = new UserContext())
@@ -142,7 +140,6 @@ namespace Services.User.Service
                 await ctx.SaveChangesAsync();
             }
         }
-
         public async Task<bool> LoginAsync(string email, string password)
         {
             using (UserContext ctx = new UserContext())
@@ -153,14 +150,13 @@ namespace Services.User.Service
                 {
                     return false;
                 }
-                if (user.PasswordHash !=  MD5Helper.CalcMD5(password + user.Salt))
+                if (user.PasswordHash != MD5Helper.CalcMD5(password + user.Salt))
                 {
                     return false;
                 }
                 return true;
             }
         }
-
         public async Task MarkDeleteAsync(long id)
         {
             using (UserContext ctx = new UserContext())
@@ -170,17 +166,15 @@ namespace Services.User.Service
                 await userBs.MarkDeleteAsync(id);
             }
         }
-
         public async Task<long> TotalCountAsync()
         {
             using (UserContext ctx = new UserContext())
             {
 
                 BaseService<UserEntity> userBs = new BaseService<UserEntity>(ctx);
-               return await userBs.GetAll().LongCountAsync();
+                return await userBs.GetAll().LongCountAsync();
             }
         }
-
         public async Task UnLockUserAsync(long id)
         {
             using (UserContext ctx = new UserContext())
@@ -195,14 +189,21 @@ namespace Services.User.Service
                 await ctx.SaveChangesAsync();
             }
         }
-
         public async Task UpdateAsync(UpdateUserDTO dto)
         {
             using (UserContext ctx = new UserContext())
             {
                 BaseService<UserEntity> userBs = new BaseService<UserEntity>(ctx);
+                var emailEntity = await userBs.GetAll().SingleOrDefaultAsync(e => e.Email == dto.Email || e.NickName == dto.NickName);
+                if (emailEntity != null)
+                {
+                    if (emailEntity.Id!=dto.Id)
+                    {
+                        throw new Exception("用户邮箱或者昵称已存在");
+                    }
+                }
                 var user = await userBs.GetAll().SingleOrDefaultAsync(e => e.Id == dto.Id);
-                if (user==null)
+                if (user == null)
                 {
                     return;
                 }
@@ -210,12 +211,40 @@ namespace Services.User.Service
                 user.City = dto.City;
                 user.Email = dto.Email;
                 user.Gender = dto.Gender;
-                if (user.Email!=dto.Email)
+                if (user.Email != dto.Email)
                 {
                     user.IsActive = false;
                 }
                 user.NickName = dto.NickName;
                 await ctx.SaveChangesAsync();
+            }
+        }
+
+        public async Task<List<ListUserDTO>> GetByIdsAsync(List<long> ids)
+        {
+            using (UserContext ctx = new UserContext())
+            {
+                BaseService<UserEntity> userBs = new BaseService<UserEntity>(ctx);
+                List<ListUserDTO> list = new List<ListUserDTO>();
+                foreach (var item in ids)
+                {
+                    var user = await userBs.GetAll().AsNoTracking().SingleAsync(e => e.Id == item);
+                    list.Add(TODTO(user));
+                }
+
+                return list;
+            }
+        }
+
+        public async Task ActiveEmailAsync(long id)
+        {
+            using (UserContext ctx = new UserContext())
+            {
+                BaseService<UserEntity> userBs = new BaseService<UserEntity>(ctx);
+               
+                var user =await userBs.GetAll().SingleAsync(e=>e.Id==id);
+                user.IsActive = true;
+               await ctx.SaveChangesAsync();
             }
         }
     }

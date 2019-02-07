@@ -22,7 +22,7 @@ namespace Services.User.Model.Entities
         /// <summary>
         /// 个性签名
         /// </summary>
-        public string Autograph { get; set; } = "";
+        public string Autograph { get; set; } = "这个人很懒，什么都没有留下";
         /// <summary>
         /// 所在城市
         /// </summary>

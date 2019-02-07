@@ -261,7 +261,7 @@ layui.define(['layer', 'laytpl', 'form', 'element', 'upload', 'util'], function(
       content = fly.escape(content||'') //XSS
       .replace(/img\[([^\s]+?)\]/g, function(img){  //转义图片
         return '<img src="' + img.replace(/(^img\[)|(\]$)/g, '') + '">';
-      }).replace(/@(\S+)(\s+?|$)/g, '@<a href="javascript:;" class="fly-aite">$1</a>$2') //转义@
+      }).replace(/@(\S+)(\s+?|$)/g, '@<a href="/user/UserHome?userName=$1" class="fly-aite">$1</a>$2') //转义@
       .replace(/face\[([^\s\[\]]+?)\]/g, function(face){  //转义表情
         var alt = face.replace(/^face/g, '');
         return '<img alt="'+ alt +'" title="'+ alt +'" src="' + fly.faces[alt] + '">';
@@ -612,8 +612,7 @@ layui.define(['layer', 'laytpl', 'form', 'element', 'upload', 'util'], function(
     ,bgcolor: '#009688'
     ,click: function(type){
       if(type === 'bar1'){
-        layer.msg('打开 index.js，开启发表新帖的路径');
-        //location.href = 'jie/add.html';
+        location.href = '/post/add';
       }
     }
   });

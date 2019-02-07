@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using NoRainForum.Computer.AdminWeb.filters;
 using NoRainForumCommon;
 using NoRainSDK.Models;
 using NoRainSDK.src;
@@ -16,6 +17,7 @@ namespace NoRainForum.Computer.AdminWeb.Controllers
         {
             this.SettingSvc = SettingSvc;
         }
+        [CheckPermission("Setting.List")]
         public async Task<IActionResult> List(int pageIndex = 1, int pageDataCount = 10)
         {
             var model = await SettingSvc.GetPageDataAsync(pageIndex, pageDataCount);
@@ -32,6 +34,7 @@ namespace NoRainForum.Computer.AdminWeb.Controllers
 
         }
         [HttpPost]
+        [CheckPermission("Setting.Delete")]
         public async Task<IActionResult> Delete(long id)
         {
 
@@ -43,11 +46,13 @@ namespace NoRainForum.Computer.AdminWeb.Controllers
         }
 
         [HttpGet]
+        [CheckPermission("Setting.Add")]
         public IActionResult Add()
         {
             return View();
         }
         [HttpPost]
+        [CheckPermission("Setting.Add")]
         public async Task<IActionResult> Add(AddSettingModel model)
         {
             if (await SettingSvc.AddNewAsync(model) < 1)
@@ -57,6 +62,7 @@ namespace NoRainForum.Computer.AdminWeb.Controllers
             return Json(new AjaxResult { Status = "ok" });
         }
         [HttpGet]
+        [CheckPermission("Setting.Edit")]
         public async Task<IActionResult> Edit(long id)
         {
             var model = await SettingSvc.GetByIdAsync(id);
@@ -67,6 +73,7 @@ namespace NoRainForum.Computer.AdminWeb.Controllers
             return View(model);
         }
         [HttpPost]
+        [CheckPermission("Setting.Edit")]
         public async Task<IActionResult> Edit(UpdateSettingModel model)
         {
             if (!await SettingSvc.UpdateAsync(model))

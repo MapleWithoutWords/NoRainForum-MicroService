@@ -7,8 +7,14 @@ using System.Threading.Tasks;
 
 namespace Services.Post.IService
 {
-    public interface IPostService : IBaseService<ListPostDTO>
+    public interface IPostService : ISupport
     {
+        Task<List<ListPostDTO>> GetAdminWebPageDataAsync(int pageIndex = 1, int pageDataCount = 10);
+        Task<long> GetAdminWebTotalCountAsync();
+        Task<ListContentPostDTO> GetByIdAsync(long id);
+        Task<List<ListPostDTO>> GetPageDataAsync(int pageIndex = 1, int pageDataCount = 10, bool? isKnot=null, bool? isEssence=null);
+        Task MarkDeleteAsync(long id);
+        Task<long> TotalCountAsync();
         Task<long> AddNewAsync(AddPostDTO dto);
         Task UpdateAsync(UpdatePostDTO dto);
         /// <summary>
@@ -38,8 +44,9 @@ namespace Services.Post.IService
         /// </summary>
         /// <returns></returns>
         Task<List<ListPostDTO>> GetByDayCommentAsync();
+        Task<List<ListPostDTO>> GetQuestionPostByUserIdAsync(long userId);
 
-
-        Task<long> UserCollectionPostAsync(long userId,long postId);
+        Task<long> UserCollectionPostAsync(long userId, long postId);
+        Task AdoptPostAsync(long userId,long postId,long commentId);
     }
 }

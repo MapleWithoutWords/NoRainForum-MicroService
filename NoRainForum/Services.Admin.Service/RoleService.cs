@@ -21,6 +21,12 @@ namespace Services.Admin.Service
             entity.Name = dto.Name;
             using (AdminUserContext ctx = new AdminUserContext())
             {
+                BaseService<RoleEntity> bs = new BaseService<RoleEntity>(ctx);
+                var per = await bs.GetAll().SingleOrDefaultAsync(e => e.Name == dto.Name);
+                if (per != null)
+                {
+                    throw new Exception("角色名已存在");
+                }
                 await ctx.Roles.AddAsync(entity);
                 await ctx.SaveChangesAsync();
                 return entity.Id;
@@ -160,6 +166,14 @@ namespace Services.Admin.Service
             using (AdminUserContext ctx = new AdminUserContext())
             {
                 BaseService<RoleEntity> roleBs = new BaseService<RoleEntity>(ctx);
+                var namePer = await roleBs.GetAll().SingleOrDefaultAsync(e => e.Name == dto.Name);
+                if (namePer != null)
+                {
+                    if (dto.Id != namePer.Id)
+                    {
+                        throw new Exception("权限名已存在");
+                    }
+                }
                 var entity = await roleBs.GetAll().SingleAsync(e => e.Id == dto.Id);
                 entity.Description = dto.Description;
                 entity.Name = dto.Name;

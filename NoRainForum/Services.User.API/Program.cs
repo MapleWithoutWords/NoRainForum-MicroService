@@ -25,11 +25,12 @@ namespace Services.User.API
             if (string.IsNullOrEmpty(ip) || string.IsNullOrEmpty(port))
             {
                 ip = "127.0.0.1";
-                port = "6000";	//设置一个没有被占用的端口
+                port = "6001";	//设置一个没有被占用的端口
             }
             return WebHost.CreateDefaultBuilder(args)
                 .UseUrls($"http://{ip}:{port}")
-                .UseStartup<Startup>();
+                .UseStartup<Startup>()
+                .UseIISIntegration();
         }
     }
 }

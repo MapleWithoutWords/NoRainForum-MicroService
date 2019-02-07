@@ -155,7 +155,7 @@ layui.define('fly', function(exports){
     ,reply: function(li){ //回复
       var val = dom.content.val();
       var aite = '@'+ li.find('.fly-detail-user cite').text().replace(/\s/g, '');
-      dom.content.focus()
+        dom.content.focus();
       if(val.indexOf(aite) !== -1) return;
       dom.content.val(aite +' ' + val);
     }

@@ -39,6 +39,8 @@ namespace Services.Post.Service
             dto.PostId = entity.PostId;
             dto.PostTitle = entity.Post.Title;
             dto.ReplyUserId = entity.ReplyUserId;
+            dto.PostUserId = entity.Post.UserId;
+            dto.IsKnot = entity.Post.IsKnot;
             return dto;
         }
         public async Task<ListPostCommentDTO> GetByIdAsync(long id)
@@ -81,7 +83,7 @@ namespace Services.Post.Service
                 await bs.GetAll()
                     .AsNoTracking()
                     .Include(e => e.Post)
-                    .Where(e => e.CommonUserId == commentUserId&&e.CreateTime>DateTime.Now.Date)
+                    .Where(e => e.CommonUserId == commentUserId&&e.CreateTime>DateTime.Now.AddDays(-2))
                     .OrderByDescending(e => e.CreateTime)
                     .ForEachAsync(e =>
                     {
@@ -115,6 +117,7 @@ namespace Services.Post.Service
                 .AsNoTracking()
                 .Include(e => e.Post)
                 .Where(e => e.PostId == postId)
+                .OrderByDescending(e=>e.IsUse)
                 .OrderByDescending(e => e.CreateTime)
                 .Skip((pageIndex - 1) * pageDataCount).Take(pageDataCount)
                 .ForEachAsync(e =>

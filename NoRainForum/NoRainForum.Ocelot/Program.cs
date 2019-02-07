@@ -21,6 +21,7 @@ namespace NoRainForum.Ocelot
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
                 .UseUrls("http://127.0.0.1:8888")
+                .UseIISIntegration()
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
                     config.SetBasePath(hostingContext.HostingEnvironment.ContentRootPath)

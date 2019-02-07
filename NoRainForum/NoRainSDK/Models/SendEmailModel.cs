@@ -18,5 +18,6 @@ namespace NoRainSDK.Models
     {
         Register = 2,
         FoundPassword = 4,
+        ActiveEmail=8,
     }
 }

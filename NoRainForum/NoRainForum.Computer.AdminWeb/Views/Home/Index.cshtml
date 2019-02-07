@@ -1,4 +1,5 @@
-﻿@{
+﻿@model ListAdminUserDTO
+@{
     Layout = null;
 }
 <!DOCTYPE html>
@@ -36,7 +37,7 @@
 
                         <a href="javascript:;">
                             <img src="https://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg">
-                            <cite>超级管理员</cite>
+                            <cite>@Model.Name</cite>
                             <span class="layui-nav-more"></span>
                         </a>
                         <dl class="layui-nav-child layui-anim layui-anim-upbit">
@@ -57,7 +58,7 @@
                 <!-- 左侧菜单 -->
                 <ul class="layui-nav layui-nav-tree">
                     <li class="layui-nav-item layui-this">
-                        <a href="javascript:;" data-url="/Main/Main">
+                        <a href="javascript:;" data-url="/home/Main">
                             <i class="iconfont icon-home1" data-icon='icon-home1'></i>
                             <span>后台首页</span>
                         </a>
@@ -227,7 +228,7 @@
                 </ul>
                 <div class="layui-tab-content" style="min-height: 150px; ">
                     <div class="layui-tab-item layui-show">
-                        <iframe class="larry-iframe" data-id='0' src="/Main/Main"></iframe>
+                        <iframe class="larry-iframe" data-id='0' src="/home/Main"></iframe>
                     </div>
                 </div>
             </div>

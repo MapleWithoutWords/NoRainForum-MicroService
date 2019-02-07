@@ -17,12 +17,14 @@ namespace Services.Post.API.Controllers
     {
         public IPostService PostSvc { get; set; }
         public IPostTypeService TypeSvc { get; set; }
+        public IPostCommontService CommentSvc { get; set; }
         public IPostStatusService StatuSvc { get; set; }
-        public PostController(IPostService PostSvc, IPostTypeService TypeSvc, IPostStatusService StatuSvc)
+        public PostController(IPostService PostSvc, IPostTypeService TypeSvc, IPostStatusService StatuSvc, IPostCommontService CommentSvc)
         {
             this.PostSvc = PostSvc;
             this.TypeSvc = TypeSvc;
             this.StatuSvc = StatuSvc;
+            this.CommentSvc = CommentSvc;
         }
         /// <summary>
         /// 分页获取所有帖子
@@ -31,16 +33,40 @@ namespace Services.Post.API.Controllers
         /// <param name="pageDataCount"></param>
         /// <returns></returns>
         [HttpGet("GetPageData")]
-        public async Task<IActionResult> GetPageData(int pageIndex = 1, int pageDataCount = 10)
+        public async Task<IActionResult> GetPageData(int pageIndex = 1, int pageDataCount = 10, bool? isKnot = null, bool? isEssence = null)
         {
-            var Posts = await PostSvc.GetPageDataAsync(pageIndex, pageDataCount);
+            var Posts = await PostSvc.GetPageDataAsync(pageIndex, pageDataCount, isKnot, isEssence);
             var TotalCount = await PostSvc.TotalCountAsync();
             return new JsonResult(
                 new APIResult<ListModel<ListPostDTO>>()
                 {
-                    Data = new ListModel<ListPostDTO> { Datas=Posts, TotalCount=TotalCount }
+                    Data = new ListModel<ListPostDTO> { Datas = Posts, TotalCount = TotalCount }
                 });
         }
+
+        [HttpGet("GetAdminWebPageData")]
+        public  async Task<IActionResult> GetAdminWebPageData(int pageIndex = 1, int pageDataCount = 10)
+        {
+            var Posts = await PostSvc.GetAdminWebPageDataAsync(pageIndex, pageDataCount);
+            var TotalCount = await PostSvc.GetAdminWebTotalCountAsync();
+            return new JsonResult(
+                new APIResult<ListModel<ListPostDTO>>()
+                {
+                    Data = new ListModel<ListPostDTO> { Datas = Posts, TotalCount = TotalCount }
+                });
+        }
+
+        [HttpGet("GetQuestionPostByUserId")]
+        public async Task<IActionResult> GetQuestionPostByUserId(long userId)
+        {
+            var Posts = await PostSvc.GetQuestionPostByUserIdAsync(userId);
+            return new JsonResult(
+                new APIResult<List<ListPostDTO>>()
+                {
+                    Data = Posts
+                });
+        }
+
         /// <summary>
         /// 根据帖子类型分页获取帖子
         /// </summary>
@@ -65,11 +91,11 @@ namespace Services.Post.API.Controllers
                 { StatusCode = 400 };
             }
             return new JsonResult(
-                 new APIResult<ListPostModel>()
+                 new APIResult<ListModel<ListPostDTO>>()
                  {
-                     Data = new ListPostModel
+                     Data = new ListModel<ListPostDTO>
                      {
-                         Posts = await PostSvc.GetPageByTypeIdAsync(postTypeId, pageIndex, pageDataCount, IsKnot, IsEssence),
+                         Datas = await PostSvc.GetPageByTypeIdAsync(postTypeId, pageIndex, pageDataCount, IsKnot, IsEssence),
                          TotalCount = await PostSvc.GetByPostTypeIdCountAsync(postTypeId, IsKnot, IsEssence)
                      }
                  }
@@ -86,11 +112,11 @@ namespace Services.Post.API.Controllers
         public async Task<IActionResult> GetByUserId(long userId, int pageIndex = 1, int pageDataCount = 10)
         {
             return new JsonResult(
-                   new APIResult<ListPostModel>()
+                   new APIResult<ListModel<ListPostDTO>>()
                    {
-                       Data = new ListPostModel
+                       Data = new  ListModel<ListPostDTO>
                        {
-                           Posts = await PostSvc.GetByUserIdAsync(userId, pageIndex, pageDataCount),
+                           Datas = await PostSvc.GetByUserIdAsync(userId, pageIndex, pageDataCount),
                            TotalCount = await PostSvc.GetByUserIdTotalCountAsync(userId)
                        }
                    }
@@ -107,11 +133,11 @@ namespace Services.Post.API.Controllers
         public async Task<IActionResult> GetCollectionPostByUserId(long userId, int pageIndex = 1, int pageDataCount = 10)
         {
             return new JsonResult(
-                    new APIResult<ListPostModel>()
+                    new APIResult<ListModel<ListPostDTO>>()
                     {
-                        Data = new ListPostModel
+                        Data = new ListModel<ListPostDTO>
                         {
-                            Posts = await PostSvc.GetPageCollectionPostByUserIdAsync(userId, pageIndex, pageDataCount),
+                            Datas = await PostSvc.GetPageCollectionPostByUserIdAsync(userId, pageIndex, pageDataCount),
                             TotalCount = await PostSvc.GetCollectionPostByUserIdTotalCountAsync(userId)
                         }
                     }
@@ -183,6 +209,10 @@ namespace Services.Post.API.Controllers
             {
                 dto.PostStatusId = 1;
             }
+            else
+            {
+                dto.PostStatusId = 2;
+            }
             return new JsonResult(new APIResult<long> { Data = await PostSvc.AddNewAsync(dto) });
         }
         /// <summary>
@@ -223,7 +253,36 @@ namespace Services.Post.API.Controllers
             UpdatePostDTO dto = new UpdatePostDTO();
             dto.Id = model.Id;
             dto.PostStatusId = model.PostStatusId;
+            dto.IsEssence = model.IsEssence;
             await PostSvc.UpdateAsync(dto);
+            return Ok();
+        }
+
+
+
+        /// <summary>
+        /// 采纳帖子
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost("AdoptPost")]
+        public async Task<IActionResult> AdoptPost(AdoptPostModel model)
+        {
+            var post = await PostSvc.GetByIdAsync(model.PostId);
+            if (post == null)
+            {
+                return new JsonResult(new APIResult<long> { ErrorMsg = "帖子不存在" }) { StatusCode = 400 };
+            }
+            if (post.UserId!=model.UserId)
+            {
+                return new JsonResult(new APIResult<long> { ErrorMsg = "只有帖子拥有者才能采纳" }) { StatusCode = 400 };
+            }
+            var comment =await CommentSvc.GetByIdAsync(model.CommentId);
+            if (comment==null)
+            {
+                return new JsonResult(new APIResult<long> { ErrorMsg = "评论Id不存在" }) { StatusCode = 400 };
+            }
+            await PostSvc.AdoptPostAsync(model.UserId,model.PostId,model.CommentId);
             return Ok();
         }
     }

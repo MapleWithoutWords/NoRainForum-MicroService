@@ -21,6 +21,12 @@ namespace Services.Post.Service
             entity.Name = dto.Name;
             using (PostContext ctx = new PostContext())
             {
+                BaseService<PostTypeEntity> bs = new BaseService<PostTypeEntity>(ctx);
+                var status = await bs.GetAll().SingleOrDefaultAsync(e => e.Name == dto.Name);
+                if (status != null)
+                {
+                    throw new Exception("帖子类型已存在");
+                }
                 await ctx.PostTypes.AddAsync(entity);
                 await ctx.SaveChangesAsync();
                 return entity.Id;
@@ -93,6 +99,14 @@ namespace Services.Post.Service
             using (PostContext ctx = new PostContext())
             {
                 BaseService<PostTypeEntity> bs = new BaseService<PostTypeEntity>(ctx);
+                var nameEntity = await bs.GetAll().SingleOrDefaultAsync(e => e.Name == dto.Name);
+                if (nameEntity != null)
+                {
+                    if (nameEntity.Id != dto.Id)
+                    {
+                        throw new Exception("帖子类型已存在");
+                    }
+                }
                 var en = await bs.GetAll().SingleAsync(e => e.Id == dto.Id);
                 en.Description = dto.Description;
                 en.Name = dto.Name;

@@ -1,0 +1,111 @@
+﻿@model AdminWebListPostModel
+
+<section class="layui-larry-box">
+    <div class="larry-personal">
+        <div class="layui-tab">
+            <blockquote class="layui-elem-quote post_search">
+                <div class="layui-inline">
+                    <a class="layui-btn layui-btn-normal postAdd_btn">添加角色</a>
+                </div>
+                <div class="layui-inline">
+                    <a class="layui-btn layui-btn-danger batchDel">批量删除</a>
+                </div>
+                <div class="layui-inline">
+                    <span class="layui-form-mid">共有<span style="font-weight: bold"> @Model.TotalCount </span>条数据</span>
+                </div>
+            </blockquote>
+
+            <!-- 操作日志 -->
+            <div class="layui-form adminUser_list">
+                <table class="layui-table">
+                    <colgroup>
+                        <col width="10%">
+                        <col>
+                        <col>
+                        <col>
+                        <col>
+                        <col>
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th>
+                                <input name="" lay-skin="primary" lay-filter="allChoose" id="allChoose" type="checkbox">
+                                <div class="layui-unselect layui-form-checkbox" lay-skin="primary">
+                                    <i class="layui-icon"></i>
+                                </div>
+                            </th>
+                            <th>ID</th>
+                            <th>标题</th>
+                            <th>发表人</th>
+                            <th>评论数</th>
+                            <th>帖子状态</th>
+                            <th>帖子类型</th>
+                            <th>加入时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody class="adminUser_content">
+                        @for(int i=0;i<Model.Posts.Count;i++)
+                        {
+                            <tr>
+                                <td>
+                                    <input name="checked" value="@Model.Posts.ElementAt(i).Id" lay-skin="primary" lay-filter="choose" type="checkbox">
+                                    <div class="layui-unselect layui-form-checkbox" lay-skin="primary">
+                                        <i class="layui-icon"></i>
+                                    </div>
+                                </td>
+                                <td>@Model.Posts.ElementAt(i).Id</td>
+                                <td>@Model.Posts.ElementAt(i).Title</td>
+                                <td><img height="40" src="@Model.Users.ElementAt(i).HeadImgSrc" />@Model.Users.ElementAt(i).NickName</td>
+                                <td>@Model.Posts.ElementAt(i).CommentCount</td>
+                                <td>@Model.Posts.ElementAt(i).PostStatusName</td>
+                                <td>@Model.Posts.ElementAt(i).PostTypeName</td>
+                                <th>@Model.Posts.ElementAt(i).CreateTime</th>
+                                <td>
+                                    <a class="layui-btn layui-btn-mini post_edit" data-id="@Model.Posts.ElementAt(i).Id">
+                                        <i class="iconfont icon-edit"></i> 编辑
+                                    </a>
+                                    <a class="layui-btn layui-btn-danger layui-btn-mini post_del" data-id="@Model.Posts.ElementAt(i).Id" data-url="/Post/Delete">
+                                        <i class="layui-icon"></i> 删除
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <div class="larry-table-page clearfix">
+                    <div id="page" class="page">
+                        <div class="layui-box layui-laypage layui-laypage-default">
+                            @Html.Raw(Model.Page)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</section>
+
+@section scripts{
+    <script src="~/js/Ajax.js"></script>
+    <script>
+        var appConfig = {
+            name: "post",    //需要和页面名称对应
+            title: "帖子",    //显示的名称
+            addUrl: "/post/Add",   //添加弹框的路径
+            editUrl: "/Post/Edit",      //修改弹框的路径
+            delUrl: "/post/delete",
+            //批量删除Ajax
+            batchDel: function (data) {     //Array data 得到的是 需要删除的id
+                data.each(function (index, value) {
+                    console.log(value);
+
+
+                });
+
+            }
+        };
+
+    </script>
+}

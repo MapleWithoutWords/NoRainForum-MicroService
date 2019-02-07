@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
 using Microsoft.AspNetCore.Mvc;
+using NoRainForum.Computer.AdminWeb.filters;
 using NoRainForum.Computer.AdminWeb.Models;
 using NoRainForumCommon;
 using NoRainSDK.Models;
@@ -20,6 +21,7 @@ namespace NoRainForum.Computer.AdminWeb.Controllers
             this.RoleSvc = RoleSvc;
             this.PerSvc = PerSvc;
         }
+        [CheckPermission("Role.List")]
         public async Task<IActionResult> List(int pageIndex=1,int pageDataCount=10)
         {
             var model =await RoleSvc.GetPageDataAsync(pageIndex, pageDataCount);
@@ -36,12 +38,14 @@ namespace NoRainForum.Computer.AdminWeb.Controllers
 
         }
         [HttpGet]
+        [CheckPermission("Role.Add")]
         public async Task<IActionResult> Add()
         {
             var pers =await PerSvc.GetAllAsync<List<ListRolePermissionDTO>>();
             return View(pers);
         }
         [HttpPost]
+        [CheckPermission("Role.Add")]
         public async Task<IActionResult> Add(AddRoleModel model)
         {
             using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
@@ -66,6 +70,7 @@ namespace NoRainForum.Computer.AdminWeb.Controllers
             }
         }
         [HttpGet]
+        [CheckPermission("Role.Edit")]
         public async Task<IActionResult> Edit(long id)
         {
             var role = await RoleSvc.GetByIdAsync(id);
@@ -82,6 +87,7 @@ namespace NoRainForum.Computer.AdminWeb.Controllers
             return View(model);
         }
         [HttpPost]
+        [CheckPermission("Role.Edit")]
         public async Task<IActionResult> Edit(UpdateRoleModel model)
         {
             using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
@@ -107,6 +113,7 @@ namespace NoRainForum.Computer.AdminWeb.Controllers
         }
 
         [HttpPost]
+        [CheckPermission("Role.Delete")]
         public async Task<IActionResult> Delete(long id)
         {
             if (!await RoleSvc.DeleteAsync(id))

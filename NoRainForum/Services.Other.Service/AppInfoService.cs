@@ -21,6 +21,12 @@ namespace Services.Other.Service
             entity.Email = dot.Email;
             using (OtherContext ctx = new OtherContext())
             {
+                BaseService<AppInfoEntity> bs = new BaseService<AppInfoEntity>(ctx);
+                var appinfo = await bs.GetAll().SingleOrDefaultAsync(e=>e.Email==dot.Email);
+                if (appinfo!=null)
+                {
+                    throw new Exception("邮箱已存在");
+                }
                 await ctx.AppInfos.AddAsync(entity);
                 await ctx.SaveChangesAsync();
                 return entity.Id;

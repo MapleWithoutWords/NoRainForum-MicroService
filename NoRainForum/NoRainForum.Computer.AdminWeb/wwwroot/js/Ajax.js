@@ -13,18 +13,17 @@
             }
             else if (res.status == "error") {
                 layer.msg(res.errorMsg, { icon: 2, time: 1000 });
-                layer.close(index);
             }
             else if (res.status == "redirect") {
                 location.href = res.data;
             } else {
                 layer.msg("未知错误", { icon: 2, time: 1000 });
-                layer.close(index);
             }
+            layer.close(index);
         },
         error: function () {
-            layer.msg("网络错误", { icon: 2, time: 1000 });
             layer.close(index);
+            layer.msg("网络错误", { icon: 2, time: 1000 });
         }
     });
 };

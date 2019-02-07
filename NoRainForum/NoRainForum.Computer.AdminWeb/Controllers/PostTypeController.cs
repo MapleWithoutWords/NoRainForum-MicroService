@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using NoRainForum.Computer.AdminWeb.filters;
 using NoRainForumCommon;
 using NoRainSDK.Models;
 using NoRainSDK.src;
@@ -17,6 +18,7 @@ namespace NoRainForum.Computer.AdminWeb.Controllers
             this.TypeSvc = TypeSvc;
         }
         [HttpGet]
+        [CheckPermission("PostType.List")]
         public async Task<IActionResult> List(int pageIndex=1,int pageDataCount=10)
         {
             var postTypes =await TypeSvc.GetPageDataAsync(pageIndex,pageDataCount);
@@ -33,6 +35,7 @@ namespace NoRainForum.Computer.AdminWeb.Controllers
         }
 
         [HttpPost]
+        [CheckPermission("PostType.Delete")]
         public async Task<IActionResult> Delete(long id)
         {
 
@@ -44,11 +47,13 @@ namespace NoRainForum.Computer.AdminWeb.Controllers
         }
 
         [HttpGet]
+        [CheckPermission("PostType.Add")]
         public IActionResult Add()
         {
             return View();
         }
         [HttpPost]
+        [CheckPermission("PostType.Add")]
         public async Task<IActionResult> Add(AddIdNameModel model)
         {
             if (await TypeSvc.AddNewAsync(model) < 1)
@@ -58,6 +63,7 @@ namespace NoRainForum.Computer.AdminWeb.Controllers
             return Json(new AjaxResult { Status = "ok" });
         }
         [HttpGet]
+        [CheckPermission("PostType.Edit")]
         public async Task<IActionResult> Edit(long id)
         {
             var model = await TypeSvc.GetByIdAsync(id);
@@ -68,6 +74,7 @@ namespace NoRainForum.Computer.AdminWeb.Controllers
             return View(model);
         }
         [HttpPost]
+        [CheckPermission("PostType.Edit")]
         public async Task<IActionResult> Edit(UpdateIdNameModel model)
         {
             if (!await TypeSvc.UpdateAsync(model))

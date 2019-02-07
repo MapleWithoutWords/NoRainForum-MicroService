@@ -1,1 +1,145 @@
-﻿
+﻿@{
+    Layout = "~/Views/Shared/IndexLayout.cshtml";
+}
+
+<div class="fly-panel">
+    <div class="fly-panel-title fly-filter">
+        <a>置顶</a>
+    </div>
+    <!--置顶的帖子-->
+    <ul class="fly-list" id="stickPost">
+
+    </ul>
+</div>
+<!--综合帖子-->
+<div class="fly-panel" style="margin-bottom: 0;">
+
+    <div class="fly-panel-title fly-filter">
+        <a href="post/GetPageData" class="layui-this">综合</a>
+    </div>
+
+    <ul class="fly-list" id="colligatePost">
+
+    </ul>
+    <div style="text-align: center">
+        <div class="laypage-main">
+            <a href="post/GetPageData" class="laypage-next">更多求解</a>
+        </div>
+    </div>
+</div>
+
+@section side{
+    <!--温馨通道-->
+    <div class="fly-panel">
+        <h3 class="fly-panel-title">温馨通道</h3>
+        <ul class="fly-panel-main fly-list-static">
+            <li>
+                <a href="https://github.com/MapleWithoutWords/NoRainForum-MicroService" target="_blank">NoRain 的 GitHub，欢迎Star</a>
+            </li>
+            <li>
+                <a href="http://wpa.qq.com/msgrd?v=3&uin=1028139084&site=qq&menu=yes" target="_blank">
+                    在线联系作者
+                </a>
+            </li>
+        </ul>
+    </div>
+}
+
+    <script id="loadStickPost" type="text/html">
+        <!--置顶帖子-->
+        {{#  layui.each(d.posts, function(index, item){ }}
+        <li>
+            <a href="/user/home?name={{d.users[index].nickName}}" class="fly-avatar">
+                <img src="{{d.users[index].headImgSrc}}" alt="{{d.users[index].nickName}}">
+            </a>
+            <h2>
+                <a class="layui-badge">{{item.postTypeName}}</a>
+                <a href="/Post/detail?postId={{item.id}}">{{item.title}}</a>
+            </h2>
+            <div class="fly-list-info">
+                <a href="/user/home?name={{d.users[index].nickName}}" link>
+                    <cite>{{d.users[index].nickName}}</cite>
+
+                </a>
+                <span>{{item.createTime}}</span>
+                {{#  if(item.isKnot){ }}
+                <span class="layui-badge fly-badge-accept layui-hide-xs">已结</span>
+                {{#  } }}
+                <span class="fly-list-nums">
+                    <i class="iconfont icon-pinglun1" title="回答"></i> {{item.commentCount}}
+                </span>
+            </div>
+            <div class="fly-list-badge">
+                {{#  if(item.isEssence){ }}
+                <span class="layui-badge layui-bg-red">精帖</span>
+                {{#  } }}
+            </div>
+        </li>
+
+        {{#  }); }}
+        {{#  if(d.posts.length === 0){ }}
+        <div class="fly-none">没有相关数据</div>
+        {{#  } }}
+    </script>
+    <script id="loadColligatePost" type="text/html">
+        <!--综合帖子-->
+        {{#  layui.each(d.posts, function(index, item){ }}
+        <li>
+            <a href="/user/home?name={{d.users[index].nickName}}" class="fly-avatar">
+                <img src="{{d.users[index].headImgSrc}}" alt="{{d.users[index].nickName}}">
+            </a>
+            <h2>
+                <a class="layui-badge">{{item.postTypeName}}</a>
+                <a href="/Post/detail?postId={{item.id}}">{{item.title}}</a>
+            </h2>
+            <div class="fly-list-info">
+                <a href="/user/home?name={{d.users[index].nickName}}" link>
+                    <cite>{{d.users[index].nickName}}</cite>
+                </a>
+                <span>{{item.createTime}}</span>
+
+                {{#  if(item.isKnot){ }}
+                <span class="layui-badge fly-badge-accept layui-hide-xs">已结</span>
+                {{#  } }}
+
+                <span class="fly-list-nums">
+                    <i class="iconfont icon-pinglun1" title="回答"></i> {{item.commentCount}}
+                </span>
+            </div>
+            <div class="fly-list-badge">
+                {{#  if(item.isEssence){ }}
+                <span class="layui-badge layui-bg-red">精帖</span>
+                {{#  } }}
+            </div>
+        </li>
+
+        {{#  }); }}
+        {{#  if(d.posts.length === 0){ }}
+        <div class="fly-none">没有相关数据</div>
+        {{#  } }}
+    </script>
+@section scripts{
+    <script>
+        layui.use(['jquery', 'laytpl', 'layer'], function () {
+            var $ = layui.jquery,
+                laytpl = layui.laytpl,
+                layer = layui.layer;
+            FrontLoadAjax($, layer, "/home/GetPosts", {}, function (data) {
+                //综合帖子
+                let colligate = loadColligatePost.innerHTML,
+                    cooligateView = document.getElementById('colligatePost');               
+                laytpl(colligate).render({"posts": data.colligatePosts, "users": data.colligateUsers }
+                , function (html) {
+                    cooligateView.innerHTML = html;
+                });
+                //置顶帖子
+                let getTpl = loadStickPost.innerHTML
+                    , view = document.getElementById('stickPost');
+                laytpl(getTpl).render({ "posts": data.stickPosts, "users": data.stickUsers }
+                , function (html) {
+                    view.innerHTML = html;
+                });
+            });
+        })
+    </script>
+}

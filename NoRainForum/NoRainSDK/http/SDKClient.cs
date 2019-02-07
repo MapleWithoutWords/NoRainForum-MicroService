@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -13,8 +14,8 @@ namespace NoRainSDK.http
 {
     public class SDKClient
     {
-        private AppInfoSetting Setting;
-        private string ServerRoot { get; set; }
+        public AppInfoSetting Setting;
+        public string ServerRoot { get; set; }
         public SDKClient(AppInfoSetting setting, string serverRoot)
         {
             if (!ValidateCommon.IsValid(setting, out string errorMsg))
@@ -41,7 +42,7 @@ namespace NoRainSDK.http
             return await RequestAsync(HttpMethod.Put, url, data);
         }
 
-        private async Task<SDKResult> RequestAsync<T>(HttpMethod method, string url, T data) where T : class
+        public async Task<SDKResult> RequestAsync<T>(HttpMethod method, string url, T data) where T : class
         {
 
 
@@ -69,11 +70,11 @@ namespace NoRainSDK.http
                                         .Select(e => $"{e.Key}={e.Value}");
                     string queryString = string.Join("&", queries);
                     Uri uri = new Uri(ServerRoot + url + "?" + queryString);
-                    requestMessage.RequestUri = uri;
                     string path = new Regex("^/.+(/api/.*)$").Match(uri.PathAndQuery).Groups[1].Value;
                     sign = MD5Helper.CalcMD5(path + Setting.AppSecret);
                     requestMessage.Headers.Add("sign", sign);
                     requestMessage.Headers.Add("appKey", Setting.AppKey);
+                    requestMessage.RequestUri = uri;
                     return await SendAsync(requestMessage);
                 }
                 else if (method == HttpMethod.Put || method == HttpMethod.Post)
@@ -99,7 +100,7 @@ namespace NoRainSDK.http
             }
 
         }
-        private async Task<SDKResult> SendAsync(HttpRequestMessage requestMessage)
+        public async Task<SDKResult> SendAsync(HttpRequestMessage requestMessage)
         {
             using (HttpClient client = new HttpClient())
             {

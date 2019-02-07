@@ -4,10 +4,15 @@
       "DownstreamPathTemplate": "/{url}",
       "DownstreamScheme": "http",
       "UpstreamPathTemplate": "/AdminService/{url}",
-      "UpstreamHttpMethod": [ "Get", "Post","Put","Delete" ],
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ],
       "ServiceName": "AdminService",
       "LoadBalancerOptions": {
         "Type": "RoundRobin"
+      },
+      "QoSOptions": {
+        "ExceptionsAllowedBeforeBreaking": 3,
+        "DurationOfBreak": 5,
+        "TimeoutValue": 5000
       },
       "UseServiceDiscovery": true
     },
@@ -20,6 +25,11 @@
       "LoadBalancerOptions": {
         "Type": "RoundRobin"
       },
+      "QoSOptions": {
+        "ExceptionsAllowedBeforeBreaking": 3,
+        "DurationOfBreak": 5,
+        "TimeoutValue": 5000
+      },
       "UseServiceDiscovery": true
     },
     {
@@ -31,6 +41,11 @@
       "LoadBalancerOptions": {
         "Type": "RoundRobin"
       },
+      "QoSOptions": {
+        "ExceptionsAllowedBeforeBreaking": 3,
+        "DurationOfBreak": 5,
+        "TimeoutValue": 5000
+      },
       "UseServiceDiscovery": true
     },
     {
@@ -41,6 +56,11 @@
       "ServiceName": "OtherService",
       "LoadBalancerOptions": {
         "Type": "RoundRobin"
+      },
+      "QoSOptions": {
+        "ExceptionsAllowedBeforeBreaking": 3,
+        "DurationOfBreak": 5,
+        "TimeoutValue": 5000
       },
       "UseServiceDiscovery": true
     }

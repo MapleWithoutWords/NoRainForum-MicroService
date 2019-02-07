@@ -9,7 +9,6 @@ namespace NoRainSDK.Models
         public long Id { get; set; }
         public DateTime CreateTime { get; set; }
         public string Title { get; set; }
-        public string Content { get; set; }
         /// <summary>
         /// 发表人Id
         /// </summary>
@@ -38,5 +37,9 @@ namespace NoRainSDK.Models
         /// 是否精华
         /// </summary>
         public bool IsEssence { get; set; } = false;
+        /// <summary>
+        /// 评论数量
+        /// </summary>
+        public long CommentCount { get; set; }
     }
 }

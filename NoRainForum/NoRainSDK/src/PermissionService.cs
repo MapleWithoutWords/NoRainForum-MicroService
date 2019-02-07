@@ -84,6 +84,7 @@ namespace NoRainSDK.src
             }
             else if (result.StatusCode == System.Net.HttpStatusCode.OK)
             {
+                return Convert.ToBoolean(obj["data"]);
                 return JsonConvert.DeserializeObject<bool>(obj["data"] == null ? "" : obj["data"].ToString());
             }
             else

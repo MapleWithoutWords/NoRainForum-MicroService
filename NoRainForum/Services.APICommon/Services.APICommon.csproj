@@ -15,7 +15,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Services.Common\Services.Common.csproj" />
-    <ProjectReference Include="..\Services.Other.DTO\Services.Other.DTO.csproj" />
   </ItemGroup>
 
   <ItemGroup>
