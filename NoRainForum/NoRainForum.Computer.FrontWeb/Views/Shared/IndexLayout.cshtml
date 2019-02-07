@@ -1,0 +1,207 @@
+﻿
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>NoRain论坛</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="keywords" content="NoRain论坛">
+    <meta name="description" content="NoRain论坛是一个供学习交流的论坛">
+    <link rel="stylesheet" href="~/layui/css/layui.css">
+    <link rel="stylesheet" href="~/css/global.css">
+</head>
+<body>
+
+    <div class="fly-header layui-bg-black">
+        <div class="layui-container">
+            <a class="fly-logo" href="/">
+                <img src="~/images/logo.png" alt="layui">
+            </a>
+            <ul class="layui-nav fly-nav layui-hide-xs">
+                <li class="layui-nav-item layui-this">
+                    <a href="/"><i class="iconfont icon-jiaoliu"></i>交流</a>
+                </li>
+
+            </ul>
+
+            <ul class="layui-nav fly-nav-user" id="islogin">
+
+                <li class="layui-nav-item layui-hide" id="loginShow">
+                    <a class="fly-nav-avatar" href="javascript:;">
+                        <cite class="layui-hide-xs" id="loginUser"></cite>
+                        <i class="iconfont icon-renzheng layui-hide-xs" title="认证信息：norain 作者"></i>
+                        <img id="loginUserImg" src="#">
+                    </a>
+                    <dl class="layui-nav-child">
+                        <dd>
+                            <a href="/user/set"><i class="layui-icon">&#xe620;</i>基本设置</a>
+                        </dd>
+                        <dd>
+                            <a href="/user/message"><i class="iconfont icon-tongzhi" style="top: 4px;"></i>我的消息</a>
+                        </dd>
+                        <dd>
+                            <a href="/user/home"><i class="layui-icon" style="margin-left: 2px; font-size: 22px;">&#xe68e;</i>我的主页</a>
+                        </dd>
+                        <hr style="margin: 5px 0;">
+                        <dd><a href="javascript:void();" id="exit" style="text-align: center;">退出</a></dd>
+                    </dl>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="fly-panel fly-column">
+        <div class="layui-container">
+            <ul class="layui-clear" id="headType">
+                <li class="layui-hide-xs layui-this indexSelect"><a href="/">首页</a></li>
+                <li class="indexSelect"><a href="/Post/GetByTypeId?postTypeId=1">提问</a></li>
+                <li class="indexSelect"><a href="/Post/GetByTypeId?postTypeId=2">分享</a></li>
+                <li class="indexSelect"><a href="/Post/GetByTypeId?postTypeId=3">讨论</a></li>
+                <li class="indexSelect"><a href="/Post/GetByTypeId?postTypeId=4">建议</a></li>
+                <li class="layui-hide-xs layui-hide-sm layui-show-md-inline-block"><span class="fly-mid"></span></li>
+
+            </ul>
+
+            <div class="fly-column-right layui-hide-xs">
+                <span class="fly-search"><i class="layui-icon"></i></span>
+                <a href="/post/add" class="layui-btn">发表新帖</a>
+            </div>
+            <div class="layui-hide-sm layui-show-xs-block" style="margin-top: -10px; padding-bottom: 10px; text-align: center;">
+                <a href="/post/add" class="layui-btn">发表新帖</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="layui-container">
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md8">
+                @RenderBody()
+            </div>
+            <div class="layui-col-md4">
+                @RenderSection("side", false)
+
+
+                <!--本周热议-->
+                <dl class="fly-panel fly-list-one" id="dayPost"></dl>
+                <!--广告区域-->
+                <div class="fly-panel">
+                    <div class="fly-panel-title">
+                        广告区域
+                    </div>
+                    <div class="fly-panel-main">
+                        <a href="https://github.com/ThreeMammals/Ocelot" target="_blank" class="fly-zanzhu" time-limit="2017.09.25-2099.01.01" style="background-color: #5FB878;">推荐开源网关Ocelot</a>
+                    </div>
+                </div>
+                <!--友情链接-->
+                <div class="fly-panel fly-link">
+                    <h3 class="fly-panel-title">友情链接</h3>
+                    <dl class="fly-panel-main">
+                        <dd>
+                            <a href="https://github.com/" target="_blank">GitHub</a>
+                        <dd>
+                        <dd><a href="https://www.lintcode.com/" target="_blank">LintCode</a>
+                        <dd>
+                        <dd><a href="https://gitter.im" target="_blank">Gitter聊天室</a>
+                        <dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="fly-footer">
+        <p><a href="http://www.norain.top/" target="_blank">NoRain社区</a> 2017 &copy; <a href="https://gitee.com/WLM-Team" target="_blank">万纳出品</a></p>
+        <p>
+            <a href="https://home.cnblogs.com/u/norain/" target="_blank">作者博客园</a>
+            <a href="https://github.com/MapleWithoutWords" target="_blank">作者GitHub</a>
+        </p>
+    </div>
+
+    <script id="loadDayPost" type="text/html">
+        <dt class="fly-panel-title">本周热议</dt>
+        {{#  layui.each(d, function(index, item){ }}
+        <dd>
+            <a href="jie/detail.html">{{item.title}}</a>
+            <span><i class="iconfont icon-pinglun1"></i> {{item.commentCount}}</span>
+        </dd>
+        {{#  }); }}
+        {{#  if(d.length === 0){ }}
+        <div class="fly-none">没有相关数据</div>
+        {{#  } }}
+    </script>
+
+    <script src="~/layui/layui.js"></script>
+    <script src="~/js/FrontAjax.js"></script>
+
+    <script>
+        layui.use(['jquery', 'laytpl', 'layer'], function () {
+            var $ = layui.jquery,
+                laytpl = layui.laytpl,
+                layer = layui.layer;
+            $('#exit').click(function () {
+                $.ajax({
+                    url: "/home/exit",
+                    type: "post",
+                    dataType: "json",
+                    success: function (res) {
+                        if (res.status == "ok") {
+                            layer.msg("退出成功！", { icon: 1, time: 1000 });
+                            location.reload();
+                        } else {
+                            layer.msg("退出失败！", { icon: 2, time: 1000 });
+                        }
+                    }
+                });
+            });
+            $.ajax({
+                url: "/home/GetLoginUser",
+                type: "post",
+                dataType: "json",
+                success: function (res) {
+                    if (res.status == "ok") {
+                        $('#loginShow').removeClass('layui-hide');
+                        $('#loginUser').text(res.data.nickName);
+                        $('#loginUserImg').attr("src", res.data.headImgSrc);
+                        $('#headType').append('<li class="layui-hide-xs layui-hide-sm layui-show-md-inline-block"><a href="user/index.html">我发表的贴</a></li><li class="layui-hide-xs layui-hide-sm layui-show-md-inline-block"><a href="user/index.html#collection">我收藏的贴</a></li>');
+                    } else {
+                        $('#islogin').html('<li class="layui-nav-item"><a class="iconfont icon-touxiang layui-hide-xs" href="/logn/index"></a></li><li class="layui-nav-item"><a href="/login/index">登入</a></li><li class="layui-nav-item"><a href="/register/index">注册</a></li>');
+                    }
+                }
+            });
+
+            FrontLoadAjax($, layer, "/home/GetDayPost", {}, function (data) {
+                let getTpl = loadDayPost.innerHTML
+                    , view = document.getElementById('dayPost');
+                laytpl(getTpl).render(data, function (html) {
+                    view.innerHTML = html;
+                });
+            });
+
+
+
+            $(document).ajaxError(function (evt, req, settings) {
+                if (req && (req.status === 200 || req.status === 0)) { return false; }
+                location.href = "/error/error500";
+            });
+        });
+    </script>
+    <script type="text/javascript">
+        layui.cache.page = '';
+        layui.cache.user = {
+            username: '游客'
+            , uid: -1
+            , avatar: '../res/images/avatar/00.jpg'
+            , experience: 83
+            , sex: '男'
+        };
+        layui.config({
+            version: "3.0.0"
+            , base: '/mods/' //这里实际使用时，建议改成绝对路径
+        }).extend({
+            fly: 'index'
+        }).use('fly');
+    </script>
+    @RenderSection("scripts", false)
+</body>
+</html>

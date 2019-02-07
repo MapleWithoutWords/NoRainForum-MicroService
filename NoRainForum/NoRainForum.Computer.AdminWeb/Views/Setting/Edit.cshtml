@@ -1,0 +1,55 @@
+﻿@model SettingDTO
+<section class="layui-larry-box">
+    <div class="larry-personal">
+        <div class="larry-personal-body clearfix">
+            <form class="layui-form col-lg-5" id="addForm">
+                <input type="hidden" lay-verify="required" name="Id" value="@Model.Id" />
+                <div class="layui-form-item">
+                    <label class="layui-form-label">KeyPari</label>
+                    <div class="layui-input-block">
+                        <input type="text" value="@Model.KeyPari" name="KeyPari" lay-verify="required" autocomplete="off" class="layui-input" placeholder="请输入昵称">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">Key</label>
+                    <div class="layui-input-block">
+                        <input type="text" lay-verify="required|email" value="@Model.Key" name="Key" autocomplete="off" class="layui-input" placeholder="请输入">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">Value</label>
+                    <div class="layui-input-block">
+                        <input type="text" lay-verify="required" value="@Model.Value" name="Value" autocomplete="off" class="layui-input" placeholder="请输入">
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit="" lay-filter="addSubmit">立即提交</button>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+@section scripts{
+    <script src="~/js/Ajax.js"></script>
+    <script>
+        var appConfig = {};
+
+        layui.use(['form', 'layer', 'jquery'], function () {
+            var form = layui.form(),
+                layer = parent.layer === undefined ? layui.layer : parent.layer,
+                $ = layui.jquery;
+            form.on('submit(addSubmit)', function (data) {
+                console.log(data.field)
+                var json = $("#addForm").serialize();
+                noRainAJAX($, layer, "/Setting/Edit", json, "添加成功");
+
+                return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+            });
+        });
+    </script>
+}
+

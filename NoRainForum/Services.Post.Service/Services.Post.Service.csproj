@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Services.Common.ServiceCommon\Services.Common.ServiceCommon.csproj" />
+    <ProjectReference Include="..\Services.Post.IService\Services.Post.IService.csproj" />
+    <ProjectReference Include="..\Services.Post.Model\Services.Post.Model.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,83 @@
+﻿@model ListUserDTO
+<section class="layui-larry-box">
+    <div class="larry-personal">
+        <div class="larry-personal-body clearfix">
+            <form class="layui-form col-lg-5" id="addForm">
+                <input type="hidden" lay-verify="required" name="Id" value="@Model.Id" />
+                <div class="layui-form-item">
+                    <label class="layui-form-label">头像:</label>
+                    <div class="layui-input-block">
+                        <img height="50" src="@Model.HeadImgSrc" alt="Alternate Text" />
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">昵称</label>
+                    <div class="layui-input-block">
+                        <input type="text" value="@Model.NickName" name="NickName" lay-verify="required" autocomplete="off" class="layui-input" placeholder="请输入昵称">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">邮箱</label>
+                    <div class="layui-input-block">
+                        <input type="text" lay-verify="required|email" value="@Model.Email" name="Email" autocomplete="off" class="layui-input" placeholder="请输入</">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">性别</label>
+                    <div class="layui-input-block">
+                        <input type="radio" name="Gender" value="true" title="男" checked="@(Model.Gender)"><div class="layui-unselect layui-form-radio layui-form-radioed"><i class="layui-anim layui-icon"></i><span>男</span></div>
+                        <input type="radio" name="Gender" value="false" title="女" checked="@(!Model.Gender)"><div class="layui-unselect layui-form-radio"><i class="layui-anim layui-icon"></i><span>女</span></div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">邮箱是否激活</label>
+                    <div class="layui-input-block">
+                        <input type="radio" name="Gender" value="true" title="是" checked="@(Model.IsActive)"><div class="layui-unselect layui-form-radio layui-form-radioed"><i class="layui-anim layui-icon"></i><span>是</span></div>
+                        <input type="radio" name="Gender" value="false" title="否" checked="@(!Model.IsActive)"><div class="layui-unselect layui-form-radio"><i class="layui-anim layui-icon"></i><span>否</span></div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">城市</label>
+                    <div class="layui-input-block">
+                        <input type="text" lay-verify="required" value="@Model.City" name="City" autocomplete="off" class="layui-input" placeholder="请输入所在城市">
+                    </div>
+                </div>
+                <div class="layui-form-item layui-form-text">
+                    <label for="L_sign" class="layui-form-label">签名</label>
+                    <div class="layui-input-block">
+                        <textarea lay-verify="required" placeholder="随便写些什么刷下存在感" id="L_sign" name="Autograph" autocomplete="off" class="layui-textarea" style="height: 80px;width:400px;">
+                        @Model.Autograph
+                        </textarea>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit="" lay-filter="addSubmit">立即提交</button>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+@section scripts{
+    <script src="~/js/Ajax.js"></script>
+    <script>
+        var appConfig = {};
+
+        layui.use(['form', 'layer', 'jquery'], function () {
+            var form = layui.form(),
+                layer = parent.layer === undefined ? layui.layer : parent.layer,
+                $ = layui.jquery;
+            form.on('submit(addSubmit)', function (data) {
+                console.log(data.field)
+                var json = $("#addForm").serialize();
+                noRainAJAX($, layer, "/user/Edit", json, "添加成功");
+
+                return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+            });
+        });
+    </script>
+}
+

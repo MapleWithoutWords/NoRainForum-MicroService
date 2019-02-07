@@ -1,0 +1,161 @@
+﻿
+@{
+    ViewData["Title"] = "GetByTypeId";
+    Layout = "~/Views/Shared/IndexLayout.cshtml";
+}
+
+<div class="fly-panel" style="margin-bottom: 0;">
+
+    <div class="fly-panel-title fly-filter">
+        <a href="javascript:void();" class="layui-this screen" screen-type="colligate">综合</a>
+        <span class="fly-mid"></span>
+        <a href="javascript:void();" class="screen" screen-type="unfinished">未结</a>
+        <span class="fly-mid"></span>
+        <a href="javascript:void();" class="screen" screen-type="finished">已结</a>
+        <span class="fly-mid"></span>
+        <a href="javascript:void();" class="screen" screen-type="essence">精华</a>
+    </div>
+    <!--帖子-->
+    <ul class="fly-list" id="postList"></ul>
+
+
+
+    <div style="text-align: center">
+        <div class="layui-box layui-laypage layui-laypage-default" id="layui-laypage-1">
+
+        </div>
+    </div>
+
+</div>
+
+<script id="loadPosts" type="text/html">
+
+    {{#  layui.each(d.posts.datas, function(index, item){ }}
+    <li>
+        <a href="/user/home?name={{d.users[index].nickName}}" class="fly-avatar">
+            <img src="{{ d.users[index].headImgSrc }}" alt="{{ d.users[index].nickName }}">
+        </a>
+        <h2>
+            <a class="layui-badge">{{item.postTypeName}}</a>
+            <a href="/post/Detail?postId={{item.id}}">{{item.title}}</a>
+        </h2>
+        <div class="fly-list-info">
+            <a href="/user/home?name={{d.users[index].nickName}}" link="">
+                <cite>{{ d.users[index].nickName }}</cite>
+
+            </a>
+            <span>{{ item.createTime }}</span>
+            {{#  if(item.isKnot){ }}
+            <span class="layui-badge fly-badge-accept layui-hide-xs">已结</span>
+            {{#  }}}
+
+            <span class="fly-list-nums">
+                <i class="iconfont icon-pinglun1" title="回答"></i> {{item.commentCount}}
+            </span>
+        </div>
+        <div class="fly-list-badge">
+            {{#  if(item.isEssence){ }}
+            <span class="layui-badge layui-bg-red">精帖</span>
+            {{#  }}}
+        </div>
+    </li>
+    {{#  }); }}
+    {{#  if(d.posts.datas.length === 0){ }}
+    <div class="fly-none">没有相关数据</div>
+    {{#  } }}
+</script>
+
+@section scripts{
+    <script type="text/javascript">
+
+
+        layui.use(['jquery', 'laytpl', 'layer', 'fly'], function () {
+            let $ = layui.jquery,
+                laytpl = layui.laytpl,
+                layer = layui.layer;
+            //获取帖子类型
+            let arrs = location.search.substring(1).split("=");
+            if (arrs[0] != "postTypeId") {
+                location.href = "/error/Error404";
+            }
+            let postTypeId = arrs[1];
+            $('.indexSelect').removeClass('layui-this');
+            console.log($('.indexSelect')[postTypeId]);
+            $($('.indexSelect')[postTypeId]).addClass('layui-this');
+            //加载帖子
+            LoadPosts(1, 5);
+            function LoadPosts(pageIndex, pageDataCount, isKnot, isEssence) {
+                isKnot = isKnot == null ? null : isKnot;
+                isEssence = isEssence == null ? null : isEssence;
+                //获取帖子类型
+                let arrs = location.search.substring(1).split("=");
+                if (arrs[0] != "postTypeId") {
+                    location.href = "/error/Error404";
+                }
+                let postTypeId = arrs[1];
+
+                let jsonData = { "postTypeId": postTypeId, "pageIndex": pageIndex, "pageDataCount": pageDataCount, "isKnot": isKnot, "isEssence": isEssence };
+                FrontLoadAjax($, layer, "/Post/GetByTypeId", jsonData, function (data) {
+                    let getTpl = loadPosts.innerHTML
+                        , view = document.getElementById('postList');
+                    $('#postList').html('');
+                    laytpl(getTpl).render(data, function (html) {
+                        view.innerHTML = html;
+                    });
+                    let html = AjaxPage(data.totalCount, pageIndex, pageDataCount, 5);
+                    $('#layui-laypage-1').html(html);
+                    $('.commentPage').click(function () {
+                        let index = $(this).attr('data-page');
+                        console.log(index);
+                        LoadPosts(index, 5);
+                    });
+                });
+                return false;
+            };
+
+            function AjaxPage(dataCount, pageIndex, pageDataCount, showPageCount) {
+                if (dataCount < pageDataCount) {
+                    return "";
+                }
+                let pageCount = Math.ceil(dataCount / pageDataCount);
+                if (pageIndex < 1 || pageIndex > pageCount) {
+                    throw new Error("pageIndex不能小于1，且不能大于总数量")
+                }
+                let startPage = Math.max(1, (pageIndex - Math.floor(showPageCount / 2)));
+                let endPage = Math.min(pageCount, (pageIndex + Math.floor(showPageCount / 2)));
+                let html = "";
+                if (pageIndex > showPageCount) {
+                    html += '< a href = "javascript:;" class="layui-laypage-prev" class="commentPage" data-page="1">首页</a >< a href = "javascript:;" class="layui-laypage-prev" class="commentPage" data-page="' + (pageIndex - 1) + '">上一页</a >';
+                }
+                for (var i = startPage; i <= endPage; i++) {
+                    if (i == pageIndex) {
+                        html += '<span class="layui-laypage-curr"><em class="layui-laypage-em"></em><em>' + i + '</em></span>';
+                    } else {
+                        html += "<a href='javascript:;' class='commentPage' data-page='" + i + "'>" + i + "</a>";
+                    }
+                }
+                if (pageIndex < pageCount - Math.floor(showPageCount / 2)) {
+                    html += '<a href = "javascript:;" class="layui-laypage-next"  class="commentPage" data-page="' + (pageIndex + 1) + '">下一页</a ><a href = "javascript:;" class="layui-laypage-prev" class="commentPage" data-page="' + pageCount + '">尾页</a >';
+                }
+                return html;
+            };
+
+            $('.screen').click(function () {
+                let type = $(this).attr("screen-type");
+                $('.screen').removeClass("layui-this");
+                $(this).addClass('layui-this');
+                if (type == "essence") {
+                    LoadPosts(1, 5,null,true);
+                }else if (type == "unfinished") {
+                    LoadPosts(1, 5,false);
+                }else if (type == "finished") {
+                    LoadPosts(1, 5,true);
+                } else {
+                    LoadPosts(1, 5);
+                }
+                return false;
+            });
+
+        });
+    </script>
+}

@@ -1,0 +1,80 @@
+﻿@model UpdateAdminUserListModel
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<section class="layui-larry-box">
+    <div class="larry-personal">
+        <!--<header class="larry-personal-tit">
+            <span>添加管理员</span>
+        </header> /header -->
+        <div class="larry-personal-body clearfix">
+            <form class="layui-form col-lg-5" id="editForm">
+                <input type="hidden" name="Id" value="@Model.Id" />
+                <div class="layui-form-item">
+                    <label class="layui-form-label">管理员姓名</label>
+                    <div class="layui-input-block">
+                        <input type="text" value="@Model.Name" name="Name" autocomplete="off" class="layui-input" placeholder="请输入管理员姓名">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">电话号码</label>
+                    <div class="layui-input-block">
+                        <input type="text" value="@Model.PhoneNum" name="PhoneNum" lay-verify="required" autocomplete="off" class="layui-input " placeholder="请输入管理员电话号码">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">年龄</label>
+                    <div class="layui-input-block">
+                        <input type="number" name="Age" lay-verify="required" value="@Model.Age" autocomplete="off" class="layui-input " placeholder="请输入管理员年龄">
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">性别</label>
+                    <div class="layui-input-block">
+                        <input type="radio" name="Gender" value="true" title="男" checked="@(Model.Gender)"><div class="layui-unselect layui-form-radio layui-form-radioed"><i class="layui-anim layui-icon"></i><span>男</span></div>
+                        <input type="radio" name="Gender" value="false" title="女" checked="@(!Model.Gender)"><div class="layui-unselect layui-form-radio"><i class="layui-anim layui-icon"></i><span>女</span></div>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">角色</label>
+                    <div class="layui-input-block">
+                        @foreach (var item in Model.Roles)
+                        {
+                            <input type="checkbox" checked="@(Model.AdminUserRoles.Any(e=>e.Id==item.Id))" value="@item.Id" name="RoleIds" title="@item.Name">
+                        }
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit="" lay-filter="editSubmit">立即提交</button>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+@section scripts{
+<script src="~/js/Ajax.js"></script>
+    <script>
+        var appConfig = {};
+
+        layui.use(['form', 'layer', 'jquery'], function () {
+            var form = layui.form(),
+                layer = parent.layer === undefined ? layui.layer : parent.layer,
+                $ = layui.jquery;
+            form.on('submit(editSubmit)', function (data) {
+                var json = $("#editForm").serialize();
+                noRainAJAX($, layer, "/AdminUser/Edit", json, "修改成功");
+
+                return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+            });
+        });
+    </script>
+}
+
+
