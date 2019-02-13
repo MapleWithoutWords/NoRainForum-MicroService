@@ -122,7 +122,7 @@
         <dt class="fly-panel-title">本周热议</dt>
         {{#  layui.each(d, function(index, item){ }}
         <dd>
-            <a href="jie/detail.html">{{item.title}}</a>
+            <a href="/post/Detail?postId={{item.id}}">{{item.title}}</a>
             <span><i class="iconfont icon-pinglun1"></i> {{item.commentCount}}</span>
         </dd>
         {{#  }); }}
