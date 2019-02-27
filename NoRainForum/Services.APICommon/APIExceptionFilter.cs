@@ -15,7 +15,7 @@ namespace Services.APICommon
             SmtpClient client = new SmtpClient("smtp.qq.com");
             client.EnableSsl = true;
             client.UseDefaultCredentials = false;
-            client.Credentials = new System.Net.NetworkCredential("1028139084@qq.com", "jwrwtwthyxaobcje");
+            client.Credentials = new System.Net.NetworkCredential("1028139084@qq.com", "123465");
             client.Port = 587;
             MailAddress from = new MailAddress("1028139084@qq.com", "NoRain论坛", Encoding.UTF8);//初始化发件人
 
